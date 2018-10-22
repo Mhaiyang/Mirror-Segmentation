@@ -18,8 +18,8 @@ class MirrorConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 8
+    GPU_COUNT = 2
+    IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # background + 1 mirror
@@ -45,7 +45,7 @@ class MirrorConfig(Config):
     # EDGE_SHAPE = [32, 32]
 
     # Use a small epoch since the data is simple
-    STEPS_PER_EPOCH = int(10395/(GPU_COUNT*IMAGES_PER_GPU))
+    STEPS_PER_EPOCH = int(3465/(GPU_COUNT*IMAGES_PER_GPU))
 
     # use small validation steps since the epoch is small
     VALIDATION_STEPS = int(741/(GPU_COUNT*IMAGES_PER_GPU))

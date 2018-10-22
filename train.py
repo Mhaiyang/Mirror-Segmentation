@@ -12,8 +12,8 @@ import os
 import mirror
 import mhy.base as modellib
 
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
@@ -79,7 +79,7 @@ elif init_with == "last":
 # 1. Train the head branches
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=20,
+            epochs=40,
             layers='heads')
 model_path = os.path.join(MODEL_DIR, "mirror_base_heads.h5")
 model.keras_model.save_weights(model_path)
@@ -87,7 +87,7 @@ model.keras_model.save_weights(model_path)
 # 2. Fine tune all layers
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=25,
+            epochs=50,
             layers="all", save_model_each_epoch=False)
 model_path = os.path.join(MODEL_DIR, "mirror_base_all.h5")
 model.keras_model.save_weights(model_path)
