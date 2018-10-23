@@ -341,24 +341,16 @@ class ProposalLayer(KE.Layer):
 
 class Attention(KE.Layer):
 
-    def __init__(self, pool_shape, channel, **kwargs):
+    def __init__(self, shape, **kwargs):
         super(Attention, self).__init__(**kwargs)
-        self.pool_shape = pool_shape
-        self.channel = channel
+        self.shape = shape
 
     def call(self, inputs):
-        repeat_shape_c = [1, self.pool_shape, self.pool_shape, 1]
-        c = KL.AveragePooling2D([self.pool_shape, self.pool_shape])(inputs)
-        c = KL.Conv2D(self.channel, (1, 1), activation="sigmoid")(c)
-        c = K.tile(c, repeat_shape_c)
-        attention_c = KL.multiply([inputs, c])
+        a = inputs[0]
+        b = K.tile(inputs[1], self.shape)
+        attention = KL.multiply([a, b])
 
-        repeat_shape_s = [1, 1, 1, self.channel]
-        s = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid")(attention_c)
-        s = K.tile(s, repeat_shape_s)
-        attention_s = KL.multiply([attention_c, s])
-
-        return attention_s
+        return attention
 
 
 class PyramidROIAlign(KE.Layer):
@@ -1511,29 +1503,57 @@ class CSA(object):
         # Top-down Layers
         # UpSampling2D : nearest neighbor interpolation.
         P5 = KL.Conv2D(512, (3, 3), padding="same", activation="relu", name="decoder_c5conv")(C5)
-        P5 = Attention(20, 512, name="decoder_p5csa")(P5)
 
+        c = KL.AveragePooling2D([20, 20])(P5)
+        c = KL.Conv2D(512, (1, 1), activation="sigmoid", name="decoder_p5c")(c)
+        attention_c = Attention([1, 20, 20, 1])([P5, c])
+
+        s = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid", name="decoder_p5s")(attention_c)
+        P5 = Attention([1, 1, 1, 512])([attention_c, s])
+
+        # P4
         P4 = KL.Add(name="decoder_p4add")([
             KL.Conv2DTranspose(256, (2, 2), strides=2, padding="same", name="decoder_p5up")(P5),
             KL.Conv2D(256, (3, 3), padding="same", name="decoder_c4p4")(C4)])
         P4 = KL.Activation("relu")(P4)
         P4 = KL.Conv2D(256, (3, 3), padding="same", activation="relu", name="decoder_p4conv")(P4)
-        P4 = Attention(40, 256, name="decoder_p4csa")(P4)
 
+        c = KL.AveragePooling2D([40, 40])(P4)
+        c = KL.Conv2D(256, (1, 1), activation="sigmoid", name="decoder_p4c")(c)
+        attention_c = Attention([1, 40, 40, 1])([P4, c])
+
+        s = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid", name="decoder_p4s")(attention_c)
+        P4 = Attention([1, 1, 1, 256])([attention_c, s])
+
+        # P3
         P3 = KL.Add(name="decoder_p3add")([
             KL.Conv2DTranspose(128, (2, 2), strides=2, padding="same", name="decoder_p4up")(P4),
             KL.Conv2D(128, (3, 3), padding="same", name="decoder_c3p3")(C3)])
         P3 = KL.Activation("relu")(P3)
         P3 = KL.Conv2D(128, (3, 3), padding="same", activation="relu", name="decoder_p3conv")(P3)
-        P3 = Attention(80, 128, name="decoder_p3csa")(P3)
 
+        c = KL.AveragePooling2D([80, 80])(P3)
+        c = KL.Conv2D(128, (1, 1), activation="sigmoid", name="decoder_p3c")(c)
+        attention_c = Attention([1, 80, 80, 1])([P3, c])
+
+        s = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid", name="decoder_p3s")(attention_c)
+        P3 = Attention([1, 1, 1, 128])([attention_c, s])
+
+        # P2
         P2 = KL.Add(name="decoder_p2add")([
             KL.Conv2DTranspose(64, (2, 2), strides=2, padding="same", name="decoder_p3up")(P3),
             KL.Conv2D(64, (3, 3), padding="same", name="decoder_c2p2")(C2)])
         P2 = KL.Activation("relu")(P2)
         P2 = KL.Conv2D(64, (3, 3), padding="same", activation="relu", name="decoder_p2conv")(P2)
-        P2 = Attention(40, 64, name="decoder_p2csa")(P2)
 
+        c = KL.AveragePooling2D([160, 160])(P2)
+        c = KL.Conv2D(64, (1, 1), activation="sigmoid", name="decoder_p2c")(c)
+        attention_c = Attention([1, 160, 160, 1])([P2, c])
+
+        s = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid", name="decoder_p2s")(attention_c)
+        P2 = Attention([1, 1, 1, 64])([attention_c, s])
+
+        # Predict mask
         p5_mask = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid", name="decoder_p5_mask")(P5)
         p4_mask = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid", name="decoder_p4_mask")(P4)
         p3_mask = KL.Conv2D(1, (3, 3), padding="same", activation="sigmoid", name="decoder_p3_mask")(P3)
@@ -1548,7 +1568,7 @@ class CSA(object):
 
             # Model
             inputs = [input_image, input_gt_mask]
-            outputs = [p5_mask, p4_mask, p3_mask, p2_mask,  p5_mask_loss, p4_mask_loss, p3_mask_loss, p2_mask_loss]
+            outputs = [p5_mask, p4_mask, p3_mask, p2_mask, p5_mask_loss, p4_mask_loss, p3_mask_loss, p2_mask_loss]
             model = KM.Model(inputs, outputs, name='CSA')
 
         else:
