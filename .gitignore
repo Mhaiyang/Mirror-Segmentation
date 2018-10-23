@@ -1,5 +1,5 @@
-.data/
-.log/
+data/
+log/
 
 .gitignore
-.resnet101.h5
+resnet101.h5
