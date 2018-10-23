@@ -10,7 +10,7 @@
 """
 import os
 import mirror
-import mhy.base as modellib
+import mhy.csa as modellib
 
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -19,7 +19,7 @@ import mhy.base as modellib
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "base")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "csa")
 
 # Local path to trained weights file
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "resnet101.h5")
@@ -61,7 +61,7 @@ dataset_val.prepare("validation")
 #     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names)
 
 ### Create Model  ###
-model = modellib.BASE(mode="training", config=config, model_dir=MODEL_DIR)
+model = modellib.CSA(mode="training", config=config, model_dir=MODEL_DIR)
 
 # Which weights to start with?
 init_with = "resnet101"  # imagenet, coco, or last
@@ -81,7 +81,7 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=40,
             layers='heads')
-model_path = os.path.join(MODEL_DIR, "mirror_base_heads.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_csa_heads.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers
@@ -89,5 +89,5 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
             epochs=50,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_base_all.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_csa_all.h5")
 model.keras_model.save_weights(model_path)
