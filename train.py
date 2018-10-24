@@ -10,7 +10,7 @@
 """
 import os
 import mirror
-import mhy.csa as modellib
+import mhy.fcn8 as modellib
 
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -19,16 +19,13 @@ import mhy.csa as modellib
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "csa")
-
-# Local path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "resnet101.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "fcn8")
     
 config = mirror.MirrorConfig()
 config.display()
 
 # Configuration
-dataset_root_path = os.path.abspath(os.path.join(ROOT_DIR, "./data"))
+dataset_root_path = os.path.abspath(os.path.join(ROOT_DIR, "./data_640"))
 train_folder = dataset_root_path + "/train"
 val_folder = dataset_root_path + "/val"
 train_image_folder = train_folder + "/image"
@@ -61,16 +58,12 @@ dataset_val.prepare("validation")
 #     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names)
 
 ### Create Model  ###
-model = modellib.CSA(mode="training", config=config, model_dir=MODEL_DIR)
+model = modellib.FCN8(mode="training", config=config, model_dir=MODEL_DIR)
 
 # Which weights to start with?
-init_with = "resnet101"  # imagenet, coco, or last
+init_with = "resnet50"  # resnet or last
 
-if init_with == "imagenet":
-    model.load_weights(model.get_imagenet_weights(), by_name=True)
-elif init_with == "resnet101":
-    model.load_weights(COCO_MODEL_PATH, by_name=True)
-elif init_with == "last":
+if init_with == "last":
     # Load the last model you trained and continue training
     model.load_weights(model.find_last()[1], by_name=True)
 
@@ -81,7 +74,7 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=40,
             layers='heads')
-model_path = os.path.join(MODEL_DIR, "mirror_csa_heads.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_fcn8_heads.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers
@@ -89,5 +82,5 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
             epochs=50,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_csa_all.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all.h5")
 model.keras_model.save_weights(model_path)

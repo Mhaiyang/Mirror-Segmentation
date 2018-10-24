@@ -30,13 +30,13 @@ class MirrorConfig(Config):
     IMAGE_MIN_DIM = 512
     IMAGE_MAX_DIM = 640
 
+    BACKBONE = "resnet50"
+    Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/resnet50.h5"
+
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
     LOSS_WEIGHTS = {
-        "p5_mask_loss": 1.,
-        "p4_mask_loss": 1.,
-        "p3_mask_loss": 1.,
-        "p2_mask_loss": 1.,
+        "mask_loss": 1.,
         # "rpn_bbox_loss": 1.,
     }
 
