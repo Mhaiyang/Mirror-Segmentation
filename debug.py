@@ -17,5 +17,5 @@
 
 import numpy as np
 
-print(np.round(0.4).astype(np.bool))
+print("iou {:.3f}".format(3.56856))
 

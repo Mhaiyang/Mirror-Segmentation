@@ -78,9 +78,8 @@ for i, imgname in enumerate(imglist):
 pixel_accuracy = 100 * sum(pas)/len(pas)
 mean_iou = 100 * sum(ious)/len(ious)
 
-print("For Test Data Set, \n{:20} {} \n{:20} {}".format("pixel_accuracy", pixel_accuracy,
-                                                        "mean_iou", mean_iou))
-
+print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f}".format("pixel_accuracy", pixel_accuracy,
+                                                                "mean_iou", mean_iou))
 
 
 

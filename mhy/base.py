@@ -1022,7 +1022,7 @@ def mask_loss_graph(input_gt_mask, pred_masks):
     """
     # Compute binary cross entropy. If no positive ROIs, then return 0.
     # shape: [batch, roi, num_classes]
-    gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 160 * tf.ones(2, dtype=tf.int32))
+    gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 640 * tf.ones(2, dtype=tf.int32))
     gt_mask = tf.round(gt_mask)
     target_masks = K.squeeze(gt_mask, -1)
 
@@ -1586,7 +1586,7 @@ class BASE(object):
         # Returns a list of the last layers of each stage, 5 in total.
         # channel 64:256:512:1024:2048
         # size 320:160:80:40:20
-        _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
+        C1, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
                                          stage5=True, train_bn=config.TRAIN_BN)
         # Top-down Layers
         # UpSampling2D : nearest neighbor interpolation.
@@ -1608,7 +1608,13 @@ class BASE(object):
             KL.Conv2D(64, (1, 1), name='decoder_c2p2')(C2)])
         P2 = KL.Activation('relu')(P2)
 
-        predict_mask = KL.Conv2D(1, (3, 3), padding="same", name="decoder_mask", activation="sigmoid")(P2)
+        P1 = KL.Add(name="decoder_p2add")([
+            KL.Conv2DTranspose(32, (2, 2), padding="same", strides=2, name="decoder_p2")(P2),
+            KL.Conv2D(32, (1, 1), name='decoder_c1p1')(C1)])
+        P1 = KL.Activation('relu')(P1)
+
+        predict_mask = KL.Conv2DTranspose(1, (2, 2), strides=2, padding="same", name="decoder_mask",
+                                          activation="sigmoid")(P1)
 
         if mode == "training":
             # Losses
