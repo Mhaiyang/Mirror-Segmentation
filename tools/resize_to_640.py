@@ -15,12 +15,12 @@ from PIL import Image
 from skimage import io, transform
 
 # Important, need modify.
-DATA_DIR = os.path.abspath(os.path.join(os.getcwd(), "../data", "test"))
+DATA_DIR = os.path.abspath(os.path.join(os.getcwd(), "../data", "val"))
 IMAGE_DIR = os.path.join(DATA_DIR, "image")
 MASK_DIR = os.path.join(DATA_DIR, "mask")
 
 # Important, need modify.
-OUTPUT_DIR = os.path.join(DATA_DIR, "../../data_640", "test")
+OUTPUT_DIR = os.path.join(DATA_DIR, "../../data_640", "val")
 if not os.path.exists(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
     os.mkdir(os.path.join(OUTPUT_DIR, "image"))
