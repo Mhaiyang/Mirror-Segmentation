@@ -225,6 +225,7 @@ def mask_loss_graph(input_gt_mask, pred_masks):
     # gt_mask = tf.round(gt_mask)
 
     target_masks = K.squeeze(input_gt_mask, -1)
+    target_masks = K.cast(target_masks, tf.float32)
 
     pred_masks = K.squeeze(pred_masks, -1)
 
@@ -354,8 +355,6 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
 
             # Init batch arrays
             if b == 0:
-                batch_image_meta = np.zeros(
-                    (batch_size,) + image_meta.shape, dtype=image_meta.dtype)
                 batch_images = np.zeros(
                     (batch_size,) + image.shape, dtype=np.float32)
                 batch_gt_masks = np.zeros(
@@ -363,7 +362,6 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                      1), dtype=gt_masks.dtype)
 
             # Add to batch
-            batch_image_meta[b] = image_meta
             batch_images[b] = mold_image(image.astype(np.float32), config)
             batch_gt_masks[b] = gt_masks
 
@@ -371,7 +369,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
 
             # Batch full?
             if b >= batch_size:
-                inputs = [batch_images, batch_image_meta, batch_gt_masks]
+                inputs = [batch_images, batch_gt_masks]
                 outputs = []
 
                 yield inputs, outputs
@@ -442,7 +440,7 @@ class FCN8(object):
         # size    320:160:80:40:20
         C1, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE, stage5=True, train_bn=config.TRAIN_BN)
 
-        backbone = KM.Model([input_image, C5], name="backbone")
+        backbone = KM.Model(input_image, C5, name="backbone")
         backbone.load_weights(self.config.Pretrained_Model_Path, by_name=True)
 
         # Top-down Layers
@@ -464,8 +462,7 @@ class FCN8(object):
 
         if mode == "training":
             # Losses
-            mask_loss = KL.Lambda(lambda x: mask_loss_graph(*x), name="mask_loss")(
-                [input_gt_mask, predict_mask])
+            mask_loss = KL.Lambda(lambda x: mask_loss_graph(*x), name="mask_loss")([input_gt_mask, predict_mask])
 
             # Model
             inputs = [input_image, input_gt_mask]
@@ -473,9 +470,7 @@ class FCN8(object):
             model = KM.Model(inputs, outputs, name='FCN8')
 
         else:
-            model = KM.Model([input_image],
-                             [predict_mask],
-                             name='FCN8')
+            model = KM.Model(input_image, predict_mask, name='FCN8')
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
@@ -716,7 +711,7 @@ class FCN8(object):
         # Pre-defined layer regular expressions
         layer_regex = {
             # all layers but the backbone
-            "heads": r"(decoder\_.*)",
+            "heads": r"(fcn\_.*)",
             # From a specific Resnet stage and up
             "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(decoder\_.*)",
             "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(decoder\_.*)",
