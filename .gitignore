@@ -4,3 +4,4 @@ log/
 .gitignore
 resnet50.h5
 resnet101.h5
+pspnet101_voc2012.h5

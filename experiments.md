@@ -11,3 +11,8 @@ mean_iou             58.40696216421803
 pixel_accuracy       61.94
  
 mean_iou             57.00
+
+# fcn8
+640*640
+
+resnet50.h5
