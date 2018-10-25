@@ -10,7 +10,7 @@
 """
 import os
 import mirror
-import mhy.fcn8 as modellib
+import mhy.decoder as modellib
 
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -19,7 +19,7 @@ import mhy.fcn8 as modellib
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "fcn8")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "decoder")
     
 config = mirror.MirrorConfig()
 config.display()
@@ -59,7 +59,7 @@ dataset_val.prepare("validation")
 
 
 ### Create Model  ###
-model = modellib.FCN8(mode="training", config=config, model_dir=MODEL_DIR)
+model = modellib.DECODER(mode="training", config=config, model_dir=MODEL_DIR)
 
 # Which weights to start with?
 init_with = "resnet101"  # resnet or last
@@ -70,18 +70,27 @@ if init_with == "last":
 
 # ## Training
 
-# 1. Train the head branches
+# 1. Train the head branches 1e-2
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=20,
+            epochs=60,
             layers='heads')
-model_path = os.path.join(MODEL_DIR, "mirror_fcn8_heads.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_decoder_heads_60.h5")
 model.keras_model.save_weights(model_path)
 
-# 2. Fine tune all layers
+# 2. Fine tune all layers 1e-3
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=30,
+            epochs=100,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_decoder_all_100.h5")
 model.keras_model.save_weights(model_path)
+
+# 3. Fine tune all layers with smaller lr. 5*1e-4
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE / 50,
+            epochs=120,
+            layers="all", save_model_each_epoch=False)
+model_path = os.path.join(MODEL_DIR, "mirror_decoder_all_120.h5")
+model.keras_model.save_weights(model_path)
+
