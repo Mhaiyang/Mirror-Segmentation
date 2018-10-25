@@ -1,7 +1,6 @@
 # Mirror-Segmentation
 Segment Mirror in Single Image
 
-**base**
+input_image tf.float32
 
-
-**csa**
+input_gt_mask tf.uint8
