@@ -1022,8 +1022,7 @@ def mask_loss_graph(input_gt_mask, pred_masks):
     """
     # Compute binary cross entropy. If no positive ROIs, then return 0.
     # shape: [batch, roi, num_classes]
-    gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 640 * tf.ones(2, dtype=tf.int32))
-    gt_mask = tf.round(gt_mask)
+    gt_mask = tf.cast(input_gt_mask, tf.float32)
     target_masks = K.squeeze(gt_mask, -1)
 
     pred_masks = K.squeeze(pred_masks, -1)
@@ -1572,8 +1571,7 @@ class BASE(object):
         # Inputs
         input_image = KL.Input(
             shape=[None, None, 3], name="input_image")
-        input_image_meta = KL.Input(shape=[config.IMAGE_META_SIZE],
-                                    name="input_image_meta")
+
         if mode == "training":
             # 1. GT Masks (zero padded)
             # [batch, height, width, 1]
@@ -1608,7 +1606,7 @@ class BASE(object):
             KL.Conv2D(64, (1, 1), name='decoder_c2p2')(C2)])
         P2 = KL.Activation('relu')(P2)
 
-        P1 = KL.Add(name="decoder_p2add")([
+        P1 = KL.Add(name="decoder_p1add")([
             KL.Conv2DTranspose(32, (2, 2), padding="same", strides=2, name="decoder_p2")(P2),
             KL.Conv2D(32, (1, 1), name='decoder_c1p1')(C1)])
         P1 = KL.Activation('relu')(P1)
@@ -1622,12 +1620,13 @@ class BASE(object):
                 [input_gt_mask, predict_mask])
 
             # Model
-            inputs = [input_image, input_image_meta, input_gt_mask]
+            inputs = [input_image, input_gt_mask]
             outputs = [predict_mask, mask_loss]
             model = KM.Model(inputs, outputs, name='BASE')
+            model.load_weights(self.config.Pretrained_Model_Path, by_name=True)
 
         else:
-            model = KM.Model([input_image, input_image_meta],
+            model = KM.Model([input_image],
                              [predict_mask],
                              name='BASE')
 
@@ -2036,10 +2035,9 @@ class BASE(object):
         results = []
         for i, image in enumerate(images):
             final_mask = self.unmold_detections(predict_mask, windows[0])
-
             image = unmold_image(molded_images[i], self.config)
-            small_image = skimage.transform.resize(image, final_mask.shape[1:3], order=1, mode="constant")
-            results.append({"image":  small_image, "mask": final_mask})
+
+            results.append({"image": image, "mask": final_mask})
 
         return results
 

@@ -15,7 +15,6 @@ t_i : total number of pixels of class i in ground truth segmentation
 
 import numpy as np
 import os
-import yaml
 from PIL import Image
 import skimage.transform
 

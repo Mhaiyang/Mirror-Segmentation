@@ -440,8 +440,9 @@ class FCN8(object):
         # size    320:160:80:40:20
         C1, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE, stage5=True, train_bn=config.TRAIN_BN)
 
-        backbone = KM.Model(input_image, C5, name="backbone")
-        backbone.load_weights(self.config.Pretrained_Model_Path, by_name=True)
+        if mode == "training":
+            backbone = KM.Model(input_image, C5, name="backbone")
+            backbone.load_weights(self.config.Pretrained_Model_Path, by_name=True)
 
         # Top-down Layers
         # UpSampling2D : nearest neighbor interpolation.
@@ -847,8 +848,7 @@ class FCN8(object):
         masks: [H, W, N] instance binary masks
         """
         assert self.mode == "inference", "Create model in inference mode."
-        assert len(
-            images) == self.config.BATCH_SIZE, "len(images) must be equal to BATCH_SIZE"
+        assert len(images) == self.config.BATCH_SIZE, "len(images) must be equal to BATCH_SIZE"
 
         # print shape, min, max, and dtype
         if verbose:
@@ -871,7 +871,7 @@ class FCN8(object):
             log("molded_images", molded_images)
             log("image_metas", image_metas)
         # Run object detection
-        predict_mask = self.keras_model.predict([molded_images, image_metas], verbose=0)
+        predict_mask = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []
@@ -879,8 +879,7 @@ class FCN8(object):
             final_mask = self.unmold_detections(predict_mask, windows[0])
 
             image = unmold_image(molded_images[i], self.config)
-            small_image = skimage.transform.resize(image, final_mask.shape[1:3], order=1, mode="constant")
-            results.append({"image":  small_image, "mask": final_mask})
+            results.append({"image": image, "mask": final_mask})
 
         return results
 

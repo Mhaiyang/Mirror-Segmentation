@@ -16,3 +16,6 @@ mean_iou             57.00
 640*640
 
 resnet50.h5
+
+# psp
+resnet101 batch_size:1

@@ -74,24 +74,30 @@ def apply_mask(image, mask, color, alpha=0.5):
     """
     for c in range(3):
         image[:, :, c] = np.where(mask == 1,
-                                  (image[:, :, c] * (1 - alpha) + alpha * color[c]) * 255,
-                                  image[:, :, c] * 255)
+                                  (image[:, :, c] * (1 - alpha) + alpha * color[c]),
+                                  image[:, :, c])
     return image
 
 
-def save_mask_and_masked_image(imgname, image, mask, OUTPUT_PATH=None):
+def save_mask_and_masked_image(imgname, image, mask_square, OUTPUT_PATH=None):
     """
     Written by Taylor Mei.
     """
-    assert image.shape[:2] == mask.shape[1:3]
+    # assert image.shape[:2] == mask.shape[1:3]
 
     # Generate random colors
-    color = [1.0, 0.0, 0.0]
-
-    mask = mask[0, :, :, 0]
+    color = [255.0, 0.0, 0.0]
+    print(np.max(mask_square))
+    mask_square = mask_square[0, :, :, 0]
     masked_image = image.astype(np.float32).copy()
-    print(mask.shape)
-    print(masked_image.shape)
+
+    height = image.shape[0]
+    width = image.shape[1]
+
+    if height > width:
+        mask = mask_square[:, 64:576]
+    elif height < width:
+        mask = mask_square[64:576, :]
     masked_image = apply_mask(masked_image, mask, color, alpha=0.5)
 
     # Save mask
