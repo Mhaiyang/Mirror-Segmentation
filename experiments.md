@@ -1,7 +1,7 @@
 640*640
 lr = 1e-4
 
-# base
+# decoder
 
 
 # fcn8

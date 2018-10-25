@@ -10,15 +10,15 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.fcn8 as modellib
+import mhy.decoder as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "fcn8")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_fcn8_all.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "decoder")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_decoder_heads.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_fcn8")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_decoder")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -36,7 +36,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.FCN8(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.DECODER(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 

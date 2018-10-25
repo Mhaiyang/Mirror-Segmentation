@@ -4,8 +4,8 @@
   @Email   : mhy845879017@gmail.com
 
   @Project : mirror
-  @File    : fcn8.py
-  @Function: FCN8, as our baseline.
+  @File    : decoder.py
+  @Function: decoder
 
 """
 
@@ -380,7 +380,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
 #  Network Class
 ############################################################
 
-class FCN8(object):
+class DECODER(object):
     """
     The actual Keras model is in the keras_model property.
     """
@@ -435,20 +435,31 @@ class FCN8(object):
 
         # Top-down Layers
         # UpSampling2D : nearest neighbor interpolation.
-        P5 = KL.Conv2D(512, (1, 1), padding="same", activation="relu", name="fcn_c5conv")(C5)
+        P5 = KL.Conv2D(512, (1, 1), name='decoder_c5p5')(C5)
+        P5 = KL.Activation("relu")(P5)
 
-        P5 = KL.Conv2D(256, (1, 1), padding="same", activation="relu", name="fcn_p5conv")(P5)
-        P5 = KL.Conv2DTranspose(256, (4, 4), strides=2, padding="same", activation="relu", name="fcn_p5up")(P5)
+        P4 = KL.Add(name="decoder_p4add")([
+            KL.Conv2DTranspose(256, (2, 2), padding="same", strides=2, name="decoder_p5up")(P5),
+            KL.Conv2D(256, (1, 1), name='decoder_c4p4')(C4)])
+        P4 = KL.Activation("relu")(P4)
 
-        P4 = KL.Conv2D(256, (1, 1), padding="same", activation="relu", name="fcn_p4conv")(C4)
-        P4 = KL.Add(name="fcn_p4add")([P4, P5])
-        P4 = KL.Conv2DTranspose(128, (4, 4), strides=2, padding="same", activation="relu", name="fcn_p4up")(P4)
+        P3 = KL.Add(name="decoder_p3add")([
+            KL.Conv2DTranspose(128, (2, 2), padding="same", strides=2, name="decoder_p4up")(P4),
+            KL.Conv2D(128, (1, 1), name='decoder_c3p3')(C3)])
+        P3 = KL.Activation("relu")(P3)
 
-        P3 = KL.Conv2D(128, (1, 1), padding="same", activation="relu", name="fcn_p3conv")(C3)
-        P3 = KL.Add(name="fcn_p3add")([P3, P4])
+        P2 = KL.Add(name="decoder_p2add")([
+            KL.Conv2DTranspose(64, (2, 2), padding="same", strides=2, name="decoder_p3")(P3),
+            KL.Conv2D(64, (1, 1), name='decoder_c2p2')(C2)])
+        P2 = KL.Activation('relu')(P2)
 
-        predict_mask = KL.Conv2DTranspose(1, (16, 16), strides=8, padding="same",
-                                          activation="sigmoid", name="fcn_mask")(P3)
+        P1 = KL.Add(name="decoder_p1add")([
+            KL.Conv2DTranspose(32, (2, 2), padding="same", strides=2, name="decoder_p2")(P2),
+            KL.Conv2D(32, (1, 1), name='decoder_c1p1')(C1)])
+        P1 = KL.Activation('relu')(P1)
+
+        predict_mask = KL.Conv2DTranspose(1, (2, 2), strides=2, padding="same", name="decoder_mask",
+                                          activation="sigmoid")(P1)
 
         if mode == "training":
             # Losses
@@ -457,10 +468,10 @@ class FCN8(object):
             # Model
             inputs = [input_image, input_gt_mask]
             outputs = [predict_mask, mask_loss]
-            model = KM.Model(inputs, outputs, name='FCN8')
+            model = KM.Model(inputs, outputs, name='DECODER')
 
         else:
-            model = KM.Model(input_image, predict_mask, name='FCN8')
+            model = KM.Model(input_image, predict_mask, name='DECODER')
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
@@ -701,7 +712,7 @@ class FCN8(object):
         # Pre-defined layer regular expressions
         layer_regex = {
             # all layers but the backbone
-            "heads": r"(fcn\_.*)",
+            "heads": r"(decoder\_.*)",
             # From a specific Resnet stage and up
             "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(decoder\_.*)",
             "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(decoder\_.*)",
