@@ -1004,7 +1004,7 @@ class PSP(object):
         windows = np.stack(windows)
         return molded_images, windows
 
-    def unmold_detections(self, predict_mask, window):
+    def unmold_detections(self, predict_mask):
         """Reformats the detections of one image from the format of the neural
         network output to a format suitable for use in the rest of the
         application.
@@ -1023,7 +1023,7 @@ class PSP(object):
         masks: [height, width, num_instances] Instance masks
         """
         # Convert neural network mask to full size mask
-        final_mask = utils.unmold_mask(predict_mask, window)
+        final_mask = utils.unmold_mask(predict_mask)
 
         return final_mask
 
@@ -1066,12 +1066,8 @@ class PSP(object):
 
         # Process detections
         results = []
-        for i, image in enumerate(images):
-            final_mask = self.unmold_detections(predict_mask, windows[0])
-
-            image = unmold_image(molded_images[i], self.config)
-            small_image = skimage.transform.resize(image, final_mask.shape[1:3], order=1, mode="constant")
-            results.append({"image":  small_image, "mask": final_mask})
+        final_mask = self.unmold_detections(predict_mask)
+        results.append({"mask": final_mask})
 
         return results
 

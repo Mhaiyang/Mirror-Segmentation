@@ -776,7 +776,6 @@ class FCN8(object):
             original image (padding excluded).
         """
         molded_images = []
-        image_metas = []
         windows = []
         # Actually only need handle one image.
         for image in images:
@@ -789,20 +788,15 @@ class FCN8(object):
                 min_scale=self.config.IMAGE_MIN_SCALE,
                 mode=self.config.IMAGE_RESIZE_MODE)
             molded_image = mold_image(molded_image, self.config)
-            # Build image_meta
-            image_meta = compose_image_meta(
-                0, image.shape, molded_image.shape, window, scale)
             # Append
             molded_images.append(molded_image)
             windows.append(window)
-            image_metas.append(image_meta)
         # Pack into arrays
         molded_images = np.stack(molded_images)
-        image_metas = np.stack(image_metas)
         windows = np.stack(windows)
-        return molded_images, image_metas, windows
+        return molded_images, windows
 
-    def unmold_detections(self, predict_mask, window):
+    def unmold_detections(self, predict_mask):
         """Reformats the detections of one image from the format of the neural
         network output to a format suitable for use in the rest of the
         application.
@@ -821,7 +815,7 @@ class FCN8(object):
         masks: [height, width, num_instances] Instance masks
         """
         # Convert neural network mask to full size mask
-        final_mask = utils.unmold_mask(predict_mask, window)
+        final_mask = utils.unmold_mask(predict_mask)
 
         return final_mask
 
@@ -847,7 +841,7 @@ class FCN8(object):
 
         # Mold inputs to format expected by the neural network
         # images is a list which has only one image.
-        molded_images, image_metas, windows = self.mold_inputs(images)
+        molded_images, windows = self.mold_inputs(images)
 
         # Validate image sizes
         # All images in a batch MUST be of the same size
@@ -858,17 +852,13 @@ class FCN8(object):
 
         if verbose:
             log("molded_images", molded_images)
-            log("image_metas", image_metas)
         # Run object detection
         predict_mask = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []
-        for i, image in enumerate(images):
-            final_mask = self.unmold_detections(predict_mask, windows[0])
-
-            image = unmold_image(molded_images[i], self.config)
-            results.append({"image": image, "mask": final_mask})
+        final_mask = self.unmold_detections(predict_mask)
+        results.append({"mask": final_mask})
 
         return results
 

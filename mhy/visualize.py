@@ -87,7 +87,6 @@ def save_mask_and_masked_image(imgname, image, mask_square, OUTPUT_PATH=None):
 
     # Generate random colors
     color = [255.0, 0.0, 0.0]
-    print(np.max(mask_square))
     mask_square = mask_square[0, :, :, 0]
     masked_image = image.astype(np.float32).copy()
 

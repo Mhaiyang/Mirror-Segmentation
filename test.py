@@ -15,7 +15,7 @@ import mhy.fcn8 as modellib
 # Directories of the project
 ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "log", "fcn8")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_fcn8_heads.h5")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_fcn8_all.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
 OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_fcn8")
@@ -62,7 +62,6 @@ for i, imgname in enumerate(imglist):
     ###########################################################################
 
     gt_mask = evaluation.get_mask(imgname, MASK_DIR)
-    gt_mask = gt_mask[:, :, 0]
     predict_mask_square = r['mask'][0, :, :, 0]
 
     height = gt_mask.shape[0]

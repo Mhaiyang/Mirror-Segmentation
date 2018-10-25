@@ -29,14 +29,14 @@ def get_mask(imgname, MASK_DIR):
     width, height = mask.size
     num_obj = np.max(mask)
 
-    gt_mask = np.zeros([height, width, 1], dtype=np.uint8)
+    gt_mask = np.zeros([height, width], dtype=np.uint8)
     for index in range(num_obj):
         """j is row and i is column"""
         for i in range(width):
             for j in range(height):
                 at_pixel = mask.getpixel((i, j))
                 if at_pixel == index + 1:
-                    gt_mask[j, i, 0] = 1
+                    gt_mask[j, i] = 1
     return gt_mask
 
 def resize_mask(gt_mask, size):
