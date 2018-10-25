@@ -10,7 +10,7 @@
 """
 import os
 import mirror
-import mhy.decoder as modellib
+import mhy.fcn8 as modellib
 
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -19,7 +19,7 @@ import mhy.decoder as modellib
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "decoder")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "fcn8")
     
 config = mirror.MirrorConfig()
 config.display()
@@ -59,7 +59,7 @@ dataset_val.prepare("validation")
 
 
 ### Create Model  ###
-model = modellib.DECODER(mode="training", config=config, model_dir=MODEL_DIR)
+model = modellib.FCN8(mode="training", config=config, model_dir=MODEL_DIR)
 
 # Which weights to start with?
 init_with = "resnet101"  # resnet or last
@@ -75,7 +75,7 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=20,
             layers='heads')
-model_path = os.path.join(MODEL_DIR, "mirror_decoder_heads.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_fcn8_heads.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers
@@ -83,5 +83,5 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
             epochs=30,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_decoder_all.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all.h5")
 model.keras_model.save_weights(model_path)

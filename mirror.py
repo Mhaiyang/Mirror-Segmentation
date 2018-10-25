@@ -18,8 +18,8 @@ class MirrorConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 2
-    IMAGES_PER_GPU = 4
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 8
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # background + 1 mirror
@@ -31,7 +31,7 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    Pretrained_Model_Path = "/home/iccd/Mirror-Segmentation/resnet101.h5"
+    Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/resnet101.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
