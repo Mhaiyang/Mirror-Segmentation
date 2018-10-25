@@ -10,7 +10,7 @@
 """
 import os
 import mirror
-import mhy.fcn8 as modellib
+import mhy.psp as modellib
 
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -19,7 +19,7 @@ import mhy.fcn8 as modellib
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "fcn8")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp")
     
 config = mirror.MirrorConfig()
 config.display()
@@ -59,7 +59,7 @@ dataset_val.prepare("validation")
 
 
 ### Create Model  ###
-model = modellib.FCN8(mode="training", config=config, model_dir=MODEL_DIR)
+model = modellib.PSP(mode="training", config=config, model_dir=MODEL_DIR)
 
 # Which weights to start with?
 init_with = "resnet101"  # resnet or last
@@ -73,15 +73,15 @@ if init_with == "last":
 # 1. Train the head branches
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=30,
-            layers='heads')
-model_path = os.path.join(MODEL_DIR, "mirror_fcn8_heads.h5")
+            epochs=15,
+            layers='all')
+model_path = os.path.join(MODEL_DIR, "mirror_psp_15.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=50,
+            epochs=20,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_20.h5")
 model.keras_model.save_weights(model_path)

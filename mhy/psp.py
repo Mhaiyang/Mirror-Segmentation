@@ -224,8 +224,7 @@ def mask_loss_graph(input_gt_mask, pred_masks):
     # gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 640 * tf.ones(2, dtype=tf.int32))
     # gt_mask = tf.round(gt_mask)
 
-    target_masks = K.squeeze(input_gt_mask, -1)
-    target_masks = K.cast(target_masks, tf.float32)
+    target_masks = K.cast(input_gt_mask, tf.float32)
 
     pred_masks = K.squeeze(pred_masks, -1)
 
@@ -266,7 +265,6 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
     # Load image and mask
     image = dataset.load_image(image_id)
     mask = dataset.load_mask(image_id)
-    original_shape = image.shape
     image, window, scale, padding, crop = utils.resize_image(
         image,
         min_dim=config.IMAGE_MIN_DIM,
@@ -274,6 +272,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         max_dim=config.IMAGE_MAX_DIM,
         mode=config.IMAGE_RESIZE_MODE)
     mask = utils.resize_mask(mask, scale, padding, crop)
+    mask = np.round(mask)
 
     # Random horizontal flips.
     # TODO: will be removed in a future update in favor of augmentation
@@ -281,11 +280,6 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         k = random.randint(0, 1, 2, 3)
         image = np.rot90(image, k)
         mask = np.rot90(mask, k)
-
-    # Note that some boxes might be all zeros if the corresponding mask got cropped out.
-    # and here is to filter them out
-    _idx = np.sum(mask, axis=(0, 1)) > 0
-    mask = mask[:, :, _idx]
 
     return image, mask
 
@@ -354,8 +348,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                 batch_images = np.zeros(
                     (batch_size,) + image.shape, dtype=np.float32)
                 batch_gt_masks = np.zeros(
-                    (batch_size, gt_masks.shape[0], gt_masks.shape[1],
-                     1), dtype=gt_masks.dtype)
+                    (batch_size, gt_masks.shape[0], gt_masks.shape[1]), dtype=gt_masks.dtype)
 
             # Add to batch
             batch_images[b] = mold_image(image.astype(np.float32), config)
@@ -644,12 +637,12 @@ class PSP(object):
 
         # Inputs
         input_image = KL.Input(
-            shape=[640, 640, 3], name="input_image")
+            shape=[640, 640, 3], name="input_image", dtype=tf.float32)
 
         if mode == "training":
             # 1. GT Masks [batch, height, width, 1]
             input_gt_mask = KL.Input(
-                shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1], None], name="input_gt_mask", dtype=bool)
+                shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_mask", dtype=tf.uint8)
 
         # Build the backbone layers.
         res = ResNet(input_image, layers=101)
