@@ -1057,7 +1057,7 @@ class PSP(object):
 
         # Mold inputs to format expected by the neural network
         # images is a list which has only one image.
-        molded_images, image_metas, windows = self.mold_inputs(images)
+        molded_images, windows = self.mold_inputs(images)
 
         # Validate image sizes
         # All images in a batch MUST be of the same size
@@ -1068,9 +1068,8 @@ class PSP(object):
 
         if verbose:
             log("molded_images", molded_images)
-            log("image_metas", image_metas)
         # Run object detection
-        predict_mask = self.keras_model.predict([molded_images, image_metas], verbose=0)
+        predict_mask = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []

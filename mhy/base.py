@@ -1089,7 +1089,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
     image_meta = compose_image_meta(image_id, original_shape, image.shape,
                                     window, scale)
 
-    return image, image_meta, mask
+    return image, mask
 
 
 def build_detection_targets(rpn_rois, gt_class_ids, gt_boxes, gt_masks, config):
@@ -1488,15 +1488,13 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
 
             # Get GT bounding boxes and masks for image.
             image_id = image_ids[image_index]
-            image, image_meta, gt_masks = \
+            image, gt_masks = \
                 load_image_gt(dataset, config, image_id, augment=augment,
                               augmentation=augmentation,
                               use_mini_mask=config.USE_MINI_MASK)
 
             # Init batch arrays
             if b == 0:
-                batch_image_meta = np.zeros(
-                    (batch_size,) + image_meta.shape, dtype=image_meta.dtype)
                 batch_images = np.zeros(
                     (batch_size,) + image.shape, dtype=np.float32)
                 batch_gt_masks = np.zeros(
@@ -1504,7 +1502,6 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                      1), dtype=gt_masks.dtype)
 
             # Add to batch
-            batch_image_meta[b] = image_meta
             batch_images[b] = mold_image(image.astype(np.float32), config)
             batch_gt_masks[b] = gt_masks
 
@@ -1512,7 +1509,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
 
             # Batch full?
             if b >= batch_size:
-                inputs = [batch_images, batch_image_meta, batch_gt_masks]
+                inputs = [batch_images, batch_gt_masks]
                 outputs = []
 
                 yield inputs, outputs
@@ -1968,7 +1965,7 @@ class BASE(object):
         molded_images = np.stack(molded_images)
         image_metas = np.stack(image_metas)
         windows = np.stack(windows)
-        return molded_images, image_metas, windows
+        return molded_images, windows
 
     def unmold_detections(self, predict_mask, window):
         """Reformats the detections of one image from the format of the neural
@@ -2016,7 +2013,7 @@ class BASE(object):
 
         # Mold inputs to format expected by the neural network
         # images is a list which has only one image.
-        molded_images, image_metas, windows = self.mold_inputs(images)
+        molded_images, windows = self.mold_inputs(images)
 
         # Validate image sizes
         # All images in a batch MUST be of the same size
@@ -2027,9 +2024,8 @@ class BASE(object):
 
         if verbose:
             log("molded_images", molded_images)
-            log("image_metas", image_metas)
         # Run object detection
-        predict_mask = self.keras_model.predict([molded_images, image_metas], verbose=0)
+        predict_mask = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []
