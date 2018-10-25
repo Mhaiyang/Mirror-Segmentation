@@ -31,7 +31,7 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    Pretrained_Model_Path = "/home/iccd/Mirror-Segmentation/resnet50.h5"
+    Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/resnet101.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
@@ -110,14 +110,14 @@ class MirrorDataset(utils.Dataset):
         info = self.image_info[image_id]
         image = Image.open(info['mask_path'])
         num_obj = self.get_obj_index(image)
-        mask = np.zeros([info['height'], info['width'], 1], dtype=np.uint8)
+        mask = np.zeros([info['height'], info['width']], dtype=np.uint8)
         for index in range(num_obj):
             """j is row and i is column"""
             for i in range(info['width']):
                 for j in range(info['height']):
                     at_pixel = image.getpixel((i, j))
                     if at_pixel == index + 1:
-                        mask[j, i, 0] = 1  # [height width channel] i.e. [h, w, 1]
+                        mask[j, i] = 1  # [height width channel] i.e. [h, w]
 
         return mask
 

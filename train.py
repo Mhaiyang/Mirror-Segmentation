@@ -57,6 +57,7 @@ dataset_val.prepare("validation")
 #     mask, class_ids = dataset_train.load_mask(image_id)
 #     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names)
 
+
 ### Create Model  ###
 model = modellib.FCN8(mode="training", config=config, model_dir=MODEL_DIR)
 
@@ -82,5 +83,5 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
             epochs=10,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_base_heads.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all.h5")
 model.keras_model.save_weights(model_path)
