@@ -272,6 +272,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         max_dim=config.IMAGE_MAX_DIM,
         mode=config.IMAGE_RESIZE_MODE)
     mask = utils.resize_mask(mask, scale, padding, crop)
+    mask = np.round(mask)
 
     # Random horizontal flips.
     # TODO: will be removed in a future update in favor of augmentation
