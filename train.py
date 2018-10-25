@@ -73,7 +73,7 @@ if init_with == "last":
 # 1. Train the head branches
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=1,
+            epochs=20,
             layers='heads')
 model_path = os.path.join(MODEL_DIR, "mirror_decoder_heads.h5")
 model.keras_model.save_weights(model_path)
@@ -81,7 +81,7 @@ model.keras_model.save_weights(model_path)
 # 2. Fine tune all layers
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=20,
+            epochs=30,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_psp_20.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_decoder_all.h5")
 model.keras_model.save_weights(model_path)
