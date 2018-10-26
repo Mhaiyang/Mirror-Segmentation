@@ -655,7 +655,7 @@ class PSP(object):
 
         x = KL.Conv2D(1, (1, 1), strides=(1, 1), name="conv6_mirror")(x)
         x = Interp([640, 640])(x)
-        predict_mask = KL.Activation('softmax')(x)
+        predict_mask = KL.Activation('sigmoid')(x)
 
         if mode == "training":
             # Losses
@@ -909,7 +909,7 @@ class PSP(object):
         # Pre-defined layer regular expressions
         layer_regex = {
             # all layers but the backbone
-            "heads": r"(fcn\_.*)",
+            "heads": r"(conv6\_.*)",
             # From a specific Resnet stage and up
             "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(decoder\_.*)",
             "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(decoder\_.*)",
