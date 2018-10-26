@@ -13,7 +13,7 @@ import mirror
 import mhy.psp as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3, 4, 5, 6, 7"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
