@@ -965,7 +965,7 @@ class PSP(object):
             callbacks=callbacks,
             validation_data=next(val_generator),
             validation_steps=self.config.VALIDATION_STEPS,
-            max_queue_size=100,
+            max_queue_size=60,
             workers=workers,
             use_multiprocessing=True
         )
