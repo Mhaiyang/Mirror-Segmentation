@@ -15,7 +15,7 @@ import mhy.fcn8 as modellib
 # Directories of the project
 ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "log", "fcn8")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_fcn8_all_100.h5")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_fcn8_all_120.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
 OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_fcn8")
