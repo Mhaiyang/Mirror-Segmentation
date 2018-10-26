@@ -31,7 +31,7 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/pspnet101_voc2012.h5"
+    Pretrained_Model_Path = "/home/mhy/Mirror-Segmentation/pspnet101_voc2012.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
