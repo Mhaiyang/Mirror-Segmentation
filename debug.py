@@ -15,7 +15,9 @@
 # with tf.Session() as sess:
 #     print(sess.run(a))
 
+import skimage.io
 import numpy as np
 
-print("iou {:.3f}".format(3.56856))
+edge = skimage.io.imread("/home/taylor/Mirror-Segmentation/data_640/train/mask/179_640x512_json/edge.png")
+print(np.max((edge/255).astype(np.uint8)))
 

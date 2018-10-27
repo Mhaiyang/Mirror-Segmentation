@@ -18,8 +18,8 @@ class MirrorConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 4
-    IMAGES_PER_GPU = 6
+    GPU_COUNT = 2
+    IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # background + 1 mirror
@@ -31,13 +31,15 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    # Pretrained_Model_Path = "/home/mhy/Mirror-Segmentation/pspnet101_voc2012.h5"
-    Pretrained_Model_Path = "/root/resnet101.h5"
+    Pretrained_Model_Path = "/home/iccd/Mirror-Segmentation/pspnet101_voc2012.h5"
+    # Pretrained_Model_Path = "/root/resnet101.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
     LOSS_WEIGHTS = {
         "mask_loss": 1.,
+        "semantic_loss": 1.,
+        "edge_loss": 1.,
         # "rpn_bbox_loss": 1.,
     }
 
@@ -124,7 +126,8 @@ class MirrorDataset(utils.Dataset):
 
     def load_edge(self, image_id):
         info = self.image_info[image_id]
-        edge = skimage.io.imread(info["edge_path"])
+        edge_gray = skimage.io.imread(info["edge_path"])
+        edge = (edge_gray[:, :]/255).astype(np.uint8)
 
         return edge
 
