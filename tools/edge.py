@@ -14,7 +14,7 @@ import numpy as np
 import cv2
 from PIL import Image
 
-DATA_DIR = "/home/taylor/Mirror-Segmentation/data_640/test"
+DATA_DIR = "/home/iccd/Mirror-Segmentation/data_640/val"
 IMAGE_DIR = os.path.join(DATA_DIR, "image")
 
 imglist = os.listdir(IMAGE_DIR)
