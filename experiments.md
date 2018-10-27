@@ -15,6 +15,9 @@ pixel_accuracy       74.45
 
 mean_iou             63.58
 
+resnet101.h5 batch 4*8 120epoch
+
+
 # psp
 pspnet101_voc2012.h5 batch 4*1 40epoch
 
