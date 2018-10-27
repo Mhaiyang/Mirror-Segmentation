@@ -435,9 +435,9 @@ class FCN8(object):
 
         # Top-down Layers
         # UpSampling2D : nearest neighbor interpolation.
-        C5 = KL.Conv2D(4096, (7, 7), padding="same", activation="relu", name="fcn_c5conv1")(C5)
+        C5 = KL.Conv2D(2048, (7, 7), padding="same", activation="relu", name="fcn_c5conv1")(C5)
         C5 = KL.Dropout(0.5)(C5)
-        C5 = KL.Conv2D(4096, (1, 1), padding="same", activation="relu", name="fcn_c5conv2")(C5)
+        C5 = KL.Conv2D(2048, (1, 1), padding="same", activation="relu", name="fcn_c5conv2")(C5)
         C5 = KL.Dropout(0.5)(C5)
 
         P5 = KL.Conv2D(1, (1, 1), padding="same", activation="relu", name="fcn_c5conv3")(C5)
