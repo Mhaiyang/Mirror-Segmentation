@@ -435,16 +435,19 @@ class FCN8(object):
 
         # Top-down Layers
         # UpSampling2D : nearest neighbor interpolation.
-        P5 = KL.Conv2D(512, (1, 1), padding="same", activation="relu", name="fcn_c5conv")(C5)
+        C5 = KL.Conv2D(4096, (7, 7), padding="same", activation="relu", name="fcn_c5conv1")(C5)
+        C5 = KL.Dropout(0.5)(C5)
+        C5 = KL.Conv2D(4096, (1, 1), padding="same", activation="relu", name="fcn_c5conv2")(C5)
+        C5 = KL.Dropout(0.5)(C5)
 
-        P5 = KL.Conv2D(256, (1, 1), padding="same", activation="relu", name="fcn_p5conv")(P5)
-        P5 = KL.Conv2DTranspose(256, (4, 4), strides=2, padding="same", activation="relu", name="fcn_p5up")(P5)
+        P5 = KL.Conv2D(1, (1, 1), padding="same", activation="relu", name="fcn_c5conv3")(C5)
+        P5 = KL.Conv2DTranspose(1, (4, 4), strides=2, padding="same", activation="relu", name="fcn_p5up")(P5)
 
-        P4 = KL.Conv2D(256, (1, 1), padding="same", activation="relu", name="fcn_p4conv")(C4)
+        P4 = KL.Conv2D(1, (1, 1), padding="same", activation="relu", name="fcn_c4conv")(C4)
         P4 = KL.Add(name="fcn_p4add")([P4, P5])
-        P4 = KL.Conv2DTranspose(128, (4, 4), strides=2, padding="same", activation="relu", name="fcn_p4up")(P4)
+        P4 = KL.Conv2DTranspose(1, (4, 4), strides=2, padding="same", activation="relu", name="fcn_p4up")(P4)
 
-        P3 = KL.Conv2D(128, (1, 1), padding="same", activation="relu", name="fcn_p3conv")(C3)
+        P3 = KL.Conv2D(1, (1, 1), padding="same", activation="relu", name="fcn_c3conv")(C3)
         P3 = KL.Add(name="fcn_p3add")([P3, P4])
 
         predict_mask = KL.Conv2DTranspose(1, (16, 16), strides=8, padding="same",

@@ -73,24 +73,24 @@ if init_with == "last":
 # 1. Train the head branches 1e-2
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=60,
+            epochs=80,
             layers='heads')
-model_path = os.path.join(MODEL_DIR, "mirror_fcn8_heads_60.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_fcn8_heads_80.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers 1e-3
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=100,
-            layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all_100.h5")
-model.keras_model.save_weights(model_path)
-
-# 3. Fine tune all layers with smaller lr 2*1e-4
-model.train(dataset_train, dataset_val,
-            learning_rate=config.LEARNING_RATE / 50,
             epochs=120,
             layers="all", save_model_each_epoch=False)
 model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all_120.h5")
 model.keras_model.save_weights(model_path)
+
+# 3. Fine tune all layers with smaller lr 2*1e-4
+# model.train(dataset_train, dataset_val,
+#             learning_rate=config.LEARNING_RATE / 50,
+#             epochs=120,
+#             layers="all", save_model_each_epoch=False)
+# model_path = os.path.join(MODEL_DIR, "mirror_fcn8_all_120.h5")
+# model.keras_model.save_weights(model_path)
 
