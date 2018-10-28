@@ -19,7 +19,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "6, 7, 8, 9"
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_c1")
     
 config = mirror.MirrorConfig()
 config.display()
