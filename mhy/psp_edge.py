@@ -220,10 +220,11 @@ def semantic_loss_graph(input_gt_mask, semantic):
                 with values from 0 to 1.
     """
     # Compute binary cross entropy.
-    input_gt_mask = tf.expand_dims(input_gt_mask, -1)
-    gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 80 * tf.ones(2, dtype=tf.int32))
-    gt_mask = tf.squeeze(gt_mask, -1)
-    gt_mask = tf.round(gt_mask)
+    # input_gt_mask = tf.expand_dims(input_gt_mask, -1)
+    # gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 80 * tf.ones(2, dtype=tf.int32))
+    # gt_mask = tf.squeeze(gt_mask, -1)
+    # gt_mask = tf.round(gt_mask)
+    gt_mask = K.cast(input_gt_mask, tf.float32)
 
     semantic = K.squeeze(semantic, -1)
 
@@ -243,10 +244,11 @@ def edge_loss_graph(input_gt_edge, edge):
                 with values from 0 to 1.
     """
     # Compute binary cross entropy.
-    input_gt_edge = tf.expand_dims(input_gt_edge, -1)
-    gt_edge = tf.image.resize_bilinear(tf.cast(input_gt_edge, tf.float32), 80 * tf.ones(2, dtype=tf.int32))
-    gt_edge = tf.squeeze(gt_edge, -1)
-    gt_edge = tf.round(gt_edge)
+    # input_gt_edge = tf.expand_dims(input_gt_edge, -1)
+    # gt_edge = tf.image.resize_bilinear(tf.cast(input_gt_edge, tf.float32), 80 * tf.ones(2, dtype=tf.int32))
+    # gt_edge = tf.squeeze(gt_edge, -1)
+    # gt_edge = tf.round(gt_edge)
+    gt_edge = K.cast(input_gt_edge, tf.float32)
 
     edge = K.squeeze(edge, -1)
 
@@ -562,6 +564,8 @@ def ResNet(inp, layers):
     bn1 = BN(name=names[5])(cnv1)  # "conv1_3_3x3/bn"
     relu1 = KL.Activation('relu')(bn1)  # "conv1_3_3x3/relu"
 
+    C1 = relu1
+
     res = KL.MaxPooling2D(pool_size=(3, 3), padding='same',
                           strides=(2, 2))(relu1)  # "pool1_3x3_s2"
 
@@ -600,7 +604,7 @@ def ResNet(inp, layers):
         res = residual_empty(res, 8, pad=4, lvl=5, sub_lvl=i + 2)
 
     res = KL.Activation('relu')(res)
-    return res
+    return res, C1
 
 
 # ##############33 kernel module #######################33
@@ -702,7 +706,7 @@ class PSP_EDGE(object):
                 shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_edge", dtype=tf.uint8)
 
         # Build the backbone layers.
-        res = ResNet(input_image, layers=101)
+        res, C1 = ResNet(input_image, layers=101)
 
         # semantic branch
         psp_semantic = build_pyramid_pooling_module(res, [640, 640], branch="_semantic")
@@ -712,21 +716,22 @@ class PSP_EDGE(object):
         x = KL.Activation('relu')(x)
         x = KL.Dropout(0.1)(x)
 
-        semantic = KL.Conv2D(1, (1, 1), strides=(1, 1), activation="sigmoid", name="middle_semantic")(x)
+        semantic = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_semantic")(x)
+        semantic = Interp([640, 640])(semantic)
+        semantic = KL.Activation("sigmoid")(semantic)
 
-        # edge branch
-        psp_edge = build_pyramid_pooling_module(res, [640, 640], branch="_edge")
+        # edge branch. 1/8 of input image
+        y = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="edge_conv1")(C1)
+        y = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="edge_conv2")(y)
+        y = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="edge_conv3")(y)
 
-        y = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="conv5_4_edge", use_bias=False)(psp_edge)
-        y = BN(name="conv5_4_edge_bn")(y)
-        y = KL.Activation('relu')(y)
-        y = KL.Dropout(0.1)(y)
-
-        edge = KL.Conv2D(1, (1, 1), strides=(1, 1), activation="sigmoid", name="middle_edge")(y)
+        edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(y)
+        edge = Interp([640, 640])(edge)
+        edge = KL.Activation("sigmoid")(edge)
 
         # final fusion
         z = KL.Concatenate(axis=3, name="fusion")([x, y])
-        z = KL.Conv2D(1, (1, 1), strides=(1, 1), name="conv6_mirror")(z)
+        z = KL.Conv2D(1, (3, 3), strides=(1, 1), name="conv6_mirror")(z)
         z = Interp([640, 640])(z)
         predict_mask = KL.Activation('sigmoid')(z)
 
