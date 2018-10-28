@@ -28,7 +28,7 @@ pixel_accuracy       63.92
 
 mean_iou             62.70
 
-# edge
+# edge_pooling
 pspnet101_voc2012.h5 batch 2*1 40epoch
 
 pixel_accuracy       66.29 
