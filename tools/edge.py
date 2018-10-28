@@ -15,7 +15,7 @@ import cv2
 from PIL import Image
 
 # DATA_DIR = "/home/iccd/Mirror-Segmentation/data_640/val"
-DATA_DIR = "/root/Mirror-Segmentation/data_640/val"
+DATA_DIR = "/root/data_640/val"
 IMAGE_DIR = os.path.join(DATA_DIR, "image")
 
 imglist = os.listdir(IMAGE_DIR)
