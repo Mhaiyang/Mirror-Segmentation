@@ -34,3 +34,4 @@ pspnet101_voc2012.h5 batch 2*1 40epoch
 pixel_accuracy       66.29 
 
 mean_iou             64.69
+
