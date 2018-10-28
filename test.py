@@ -73,12 +73,14 @@ for i, imgname in enumerate(imglist):
         predict_mask = predict_mask_square[64:576, :]
 
     # if have edge branch
-    if height > width:
-        predict_semantic = r["semantic"][0, :, :, 0][:, 64:576]
-        predict_edge = r["edge"][0, :, :, 0][:, 64:576]
-    elif height < width:
-        predict_semantic = r["semantic"][0, :, :, 0][64:576, :]
-        predict_edge = r["edge"][0, :, :, 0][64:576, :]
+    # if height > width:
+    #     predict_semantic = r["semantic"][0, :, :, 0][:, 64:576]
+    #     predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+    # elif height < width:
+    #     predict_semantic = r["semantic"][0, :, :, 0][64:576, :]
+    #     predict_edge = r["edge"][0, :, :, 0][64:576, :]
+    predict_semantic = r["semantic"][0, :, :, 0]
+    predict_edge = r["edge"][0, :, :, 0]
     skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_semantic.jpg"), 255 * predict_semantic.astype(np.uint8))
     skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.jpg"), 255 * predict_edge.astype(np.uint8))
 
