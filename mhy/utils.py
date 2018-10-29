@@ -609,14 +609,14 @@ def unmold_semantic(semantic):
 
     Returns a binary mask with the same size as the original image.
     """
-    # threshold = 0.5
+    threshold = 0.5
     # semantic = np.squeeze(semantic, 0)
     # semantic = skimage.transform.resize(semantic, (640, 640), order=1, mode="constant")
     # semantic = np.expand_dims(semantic, 0)
-    # semantic = np.where(semantic >= threshold, 1, 0).astype(np.uint8)
+    semantic = np.where(semantic >= threshold, 1, 0).astype(np.uint8)
 
     # Final semantic
-    final_semantic = semantic.astype(np.uint8)
+    final_semantic = semantic
 
     return final_semantic
 

@@ -35,3 +35,8 @@ pixel_accuracy       66.29
 
 mean_iou             64.69
 
+# edge_c1
+pixel_accuracy       72.40
+ 
+mean_iou             69.67
+
