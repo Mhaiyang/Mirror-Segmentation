@@ -36,6 +36,7 @@ pixel_accuracy       66.29
 mean_iou             64.69
 
 # edge_c1
+pspnet101_voc2012.h5 batch 4*1 40epoch
 pixel_accuracy       72.40
  
 mean_iou             69.67
