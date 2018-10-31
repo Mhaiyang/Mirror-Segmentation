@@ -11,15 +11,15 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.psp_edge_v2 as modellib
+import mhy.psp_edge_v3 as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_v2")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_v2_all_40.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_v3")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_v3_all_40.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_edge_v2_40")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_edge_v3_40")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
