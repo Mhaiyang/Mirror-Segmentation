@@ -739,9 +739,9 @@ class PSP_EDGE_DEPTH(object):
         x = KL.Activation('relu')(x)
         x = KL.Dropout(0.1)(x)
 
-        semantic = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_semantic")(x)
-        semantic = Interp([640, 640])(semantic)
-        semantic = KL.Activation("sigmoid")(semantic)
+        # semantic = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_semantic")(x)
+        # semantic = Interp([640, 640])(semantic)
+        # semantic = KL.Activation("sigmoid")(semantic)
 
         # edge branch. 1/2 to 1/8 of input image
         y = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="edge_conv1")(C1)
@@ -768,8 +768,6 @@ class PSP_EDGE_DEPTH(object):
 
         if mode == "training":
             # middle loss
-            semantic_loss = KL.Lambda(lambda x: semantic_loss_graph(*x),
-                                      name="semantic_loss")([input_gt_mask, semantic])
             edge_loss = KL.Lambda(lambda x: edge_loss_graph(*x),
                                   name="edge_loss")([input_gt_edge, edge])
             depth_loss = KL.Lambda(lambda x: depth_loss_graph(*x),
@@ -779,12 +777,12 @@ class PSP_EDGE_DEPTH(object):
 
             # Model
             inputs = [input_image, input_gt_mask, input_gt_edge, input_gt_depth]
-            outputs = [predict_mask, semantic_loss, edge_loss, depth_loss, mask_loss]
+            outputs = [predict_mask, edge_loss, depth_loss, mask_loss]
             model = KM.Model(inputs, outputs, name='PSP_EDGE_DEPTH')
             model.load_weights(self.config.Pretrained_Model_Path, by_name=True)
 
         else:
-            model = KM.Model(input_image, [predict_mask, semantic, edge, depth], name='PSP_EDGE_DEPTH')
+            model = KM.Model(input_image, [predict_mask, edge, depth], name='PSP_EDGE_DEPTH')
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
@@ -882,7 +880,7 @@ class PSP_EDGE_DEPTH(object):
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
         self.keras_model._per_input_losses = {}
-        loss_names = ["mask_loss", "semantic_loss", "edge_loss", "depth_loss"]
+        loss_names = ["mask_loss", "edge_loss", "depth_loss"]
         for name in loss_names:
             layer = self.keras_model.get_layer(name)
             if layer.output in self.keras_model.losses:
