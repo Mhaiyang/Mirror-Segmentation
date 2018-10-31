@@ -5,16 +5,16 @@
   
   @Project : Mirror-Segmentation
   @File    : depth.py
-  @Function: Generate depth ground truth.
+  @Function: Generate mirror depth ground truth.
   
 """
 import os
 import numpy as np
 import skimage.io
 
-PREDICT_DEPTH_DIR = "/home/taylor/Depth-Prediction/nyu_depth_v2/demo/test_depth/"
-IMAGE_DIR = "/home/taylor/Mirror-Segmentation/data_640/test/image/"
-MASK_DIR = "/home/taylor/Mirror-Segmentation/data_640/test/mask/"
+PREDICT_DEPTH_DIR = "/home/taylor/Depth-Prediction/nyu_depth_v2/demo/train_depth/"
+IMAGE_DIR = "/home/taylor/Mirror-Segmentation/data_640/train/image/"
+MASK_DIR = "/home/taylor/Mirror-Segmentation/data_640/train/mask/"
 
 imglist = os.listdir(IMAGE_DIR)
 print("{} predict depth map will be processed.".format(len(imglist)))
