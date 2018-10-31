@@ -1,5 +1,6 @@
 data/
 log/
+FCRN/
 
 .gitignore
 resnet50.h5
