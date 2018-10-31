@@ -3,8 +3,8 @@ import numpy as np
 from PIL import Image
 from mhy.config import Config
 import mhy.utils as utils
-import yaml
 import skimage.io
+import skimage.color
 
 
 # Configurations
@@ -28,16 +28,16 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    # Pretrained_Model_Path = "/home/iccd/Mirror-Segmentation/pspnet101_voc2012.h5"
-    Pretrained_Model_Path = "/root/pspnet101_voc2012.h5"
+    Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/pspnet101_voc2012.h5"
+    # Pretrained_Model_Path = "/root/pspnet101_voc2012.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
     LOSS_WEIGHTS = {
         "mask_loss": 1.,
-        # "semantic_loss": 1.,
+        "semantic_loss": 1.,
         "edge_loss": 10.,
-        # "rpn_bbox_loss": 1.,
+        "depth_loss": 0.1,
     }
 
     # Use a small epoch since the data is simple
@@ -59,15 +59,6 @@ class MirrorDataset(utils.Dataset):
         n = np.max(image)
         return n
 
-    def from_yaml_get_class(self,image_id):
-        """Translate the yaml file to get label """
-        info = self.image_info[image_id]
-        with open(info['yaml_path']) as f:
-            temp = yaml.load(f.read())
-            labels = temp['label_names']
-            del labels[0]
-        return labels
-
     def draw_mask(self, num_obj, mask, image, image_id):
         info = self.image_info[image_id]
         for index in range(num_obj):
@@ -80,20 +71,32 @@ class MirrorDataset(utils.Dataset):
         return mask
 
     def load_mirror(self, count, img_folder, mask_folder, imglist):
-        self.add_class("Mirror", 1, "mirror")
-        # self.add_class("Mirror", 2, "reflection")
         for i in range(count):
             filestr = imglist[i].split(".")[0]  # 10.jpg for example
+            image_path = img_folder + "/" + imglist[i]
             mask_path = mask_folder + "/" + filestr + "_json/label8.png"
             edge_path = mask_folder + "/" + filestr + "_json/edge.png"
-            yaml_path = mask_folder + "/" + filestr + "_json/info.yaml"
+            depth_path = mask_folder + "/" + filestr + "_json/depth.png"
             if not os.path.exists(mask_path):
                 print("{} is incorrect".format(filestr))
                 continue
             img = Image.open(mask_path)
             width, height = img.size
-            self.add_image("Mirror", image_id=i, path=img_folder + "/" + imglist[i],
-                           width=width, height=height, mask_path=mask_path, edge_path=edge_path, yaml_path=yaml_path)
+            self.add_image(image_id=i, image_path=image_path, width=width, height=height,
+                           mask_path=mask_path, edge_path=edge_path, depth_path=depth_path)
+
+    def load_image(self, image_id):
+        """Load the specified image and return a [H,W,3] Numpy array.
+        """
+        # Load image
+        image = skimage.io.imread(self.image_info[image_id]['image_path'])
+        # If grayscale. Convert to RGB for consistency.
+        if image.ndim != 3:
+            image = skimage.color.gray2rgb(image)
+        # If has an alpha channel, remove it for consistency
+        if image.shape[-1] == 4:
+            image = image[..., :3]
+        return image
 
     def load_mask(self, image_id):
         global iter_num
@@ -117,6 +120,13 @@ class MirrorDataset(utils.Dataset):
         edge = (edge_gray[:, :]/255).astype(np.uint8)
 
         return edge
+
+    def load_depth(self, image_id):
+        """Load the specified depth and return a [H, W] Numpy array"""
+
+        depth = skimage.io.imread(self.image_info[image_id]['depth_path'])
+
+        return depth.astype(np.uint8)
 
 
 
