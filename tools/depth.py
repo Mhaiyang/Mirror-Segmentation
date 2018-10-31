@@ -15,9 +15,9 @@ import skimage.io
 # PREDICT_DEPTH_DIR = "/home/taylor/Depth-Prediction/nyu_depth_v2/demo/train_depth/"
 # IMAGE_DIR = "/home/taylor/Mirror-Segmentation/data_640/train/image/"
 # MASK_DIR = "/home/taylor/Mirror-Segmentation/data_640/train/mask/"
-PREDICT_DEPTH_DIR = "/root/FCRN/val_depth/"
-IMAGE_DIR = "/root/data_640/val/image/"
-MASK_DIR = "/root/data_640/val/mask/"
+PREDICT_DEPTH_DIR = "/root/FCRN/train_depth/"
+IMAGE_DIR = "/root/data_640/train/image/"
+MASK_DIR = "/root/data_640/train/mask/"
 
 imglist = os.listdir(IMAGE_DIR)
 print("{} predict depth map will be processed.".format(len(imglist)))
