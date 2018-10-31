@@ -44,7 +44,7 @@ class MirrorConfig(Config):
     STEPS_PER_EPOCH = int(3465/(GPU_COUNT*IMAGES_PER_GPU))
 
     # use small validation steps since the epoch is small
-    VALIDATION_STEPS = int(741/(GPU_COUNT*IMAGES_PER_GPU))
+    VALIDATION_STEPS = int(247/(GPU_COUNT*IMAGES_PER_GPU))
 
     # Learning rate
     LEARNING_RATE = 0.01
