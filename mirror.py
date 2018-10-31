@@ -21,9 +21,6 @@ class MirrorConfig(Config):
     GPU_COUNT = 4
     IMAGES_PER_GPU = 1
 
-    # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # background + 1 mirror
-
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     IMAGE_RESIZE_MODE = "square"
@@ -43,21 +40,11 @@ class MirrorConfig(Config):
         # "rpn_bbox_loss": 1.,
     }
 
-    # For One, Two, Three, and their combination. National Day.
-    # EDGE_SHAPE : [h, w]
-    CLASSIFY_POOL_SIZE = 7
-    MASK_POOL_SIZE = [32, 16, 8, 4]
-    MASK_SHAPE = [32, 32]
-    # EDGE_SHAPE = [32, 32]
-
     # Use a small epoch since the data is simple
     STEPS_PER_EPOCH = int(3465/(GPU_COUNT*IMAGES_PER_GPU))
 
     # use small validation steps since the epoch is small
     VALIDATION_STEPS = int(741/(GPU_COUNT*IMAGES_PER_GPU))
-
-    # skip detection with <x% confidence
-    DETECTION_MIN_CONFIDENCE = 0.7
 
     # Learning rate
     LEARNING_RATE = 0.01
