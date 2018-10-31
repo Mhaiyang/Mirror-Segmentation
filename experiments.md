@@ -59,6 +59,6 @@ mean_iou             60.07
 没有semantic监督，验证semantic监督的作用（和edge_c1比）。同时验证concat的作用（和edge_v2比）。
 
 # psp_edge_depth
-在psp_edge_c1的基础上，增加了depth预测的分支，depth有监督，叠加edge和depth的feature。
+在psp_edge_c1的基础上，增加了depth预测的分支，depth的输入为C2，depth有监督，叠加edge和depth的feature。
 
 depth来自于Depth-Prediction，然后经过处理（将镜子的深度统一为平均值）得到。
