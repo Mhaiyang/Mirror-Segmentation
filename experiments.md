@@ -44,5 +44,10 @@ mean_iou             69.67
 
 # edge_v2
 pspnet101.voc2012.h5 batch 4*1 40 epoch
+
 在edge_c1的基础上，不叠加feature，edge branch只影响backbone。
+
+pixel_accuracy       61.26
+ 
+mean_iou             60.07
 
