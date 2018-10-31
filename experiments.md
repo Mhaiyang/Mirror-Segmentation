@@ -28,7 +28,7 @@ pixel_accuracy       63.92
 
 mean_iou             62.70
 
-# edge_pooling
+# psp_edge_pooling
 使用的是1/8的C5
 
 pspnet101_voc2012.h5 batch 2*1 40epoch
@@ -37,8 +37,8 @@ pixel_accuracy       66.29
 
 mean_iou             64.69
 
-# edge_c1
-使用的是C1
+# psp_edge_c1
+使用的是C1来预测contour
 
 pspnet101_voc2012.h5 batch 4*1 40epoch
 
@@ -46,15 +46,17 @@ pixel_accuracy       72.40
  
 mean_iou             69.67
 
-# edge_v2
-pspnet101.voc2012.h5 batch 4*1 40 epoch
-
+# psp_edge_v2
 在edge_c1的基础上，不叠加feature，edge branch只影响backbone。
+
+pspnet101.voc2012.h5 batch 4*1 40 epoch
 
 pixel_accuracy       61.26
  
 mean_iou             60.07
 
-# edge_v3
+# psp_edge_v3
 没有semantic监督，验证semantic监督的作用（和edge_c1比）。同时验证concat的作用（和edge_v2比）。
 
+# psp_edge_depth
+在psp_edge_c1的基础上，增加了depth预测的分支，depth有监督，叠加edge和depth的feature。
