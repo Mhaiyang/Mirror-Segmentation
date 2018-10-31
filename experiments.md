@@ -51,3 +51,6 @@ pixel_accuracy       61.26
  
 mean_iou             60.07
 
+# edge_v3
+没有semantic监督，验证semantic监督的作用（和edge_c1比）。同时验证concat的作用（和edge_v2比）。
+
