@@ -60,3 +60,5 @@ mean_iou             60.07
 
 # psp_edge_depth
 在psp_edge_c1的基础上，增加了depth预测的分支，depth有监督，叠加edge和depth的feature。
+
+depth来自于Depth-Prediction，然后经过处理（将镜子的深度统一为平均值）得到。
