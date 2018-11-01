@@ -66,3 +66,11 @@ mean_iou             72.01
 在psp_edge_c1的基础上，增加了depth预测的分支，depth的输入为C2，depth有监督，叠加edge和depth的feature。
 
 depth来自于Depth-Prediction，然后经过处理（将镜子的深度统一为平均值）得到。
+
+pixel_accuracy       74.94 
+
+mean_iou             71.64 
+
+mean_psnr            19.58
+ 
+mean_ssim            0.8674
