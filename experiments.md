@@ -21,12 +21,24 @@ pixel_accuracy       80.07
  
 mean_iou             67.56
 
+mean_IOU             67.56
+ 
+mean_ACC             87.59 
+
+mean_BER             13.60
+
 # psp
 pspnet101_voc2012.h5 batch 4*1 40epoch
 
 pixel_accuracy       63.92 
 
 mean_iou             62.70
+
+mean_IOU             62.70
+ 
+mean_ACC             86.30 
+
+mean_BER             18.28
 
 # psp_edge_pooling
 使用的是1/8的C5
@@ -46,6 +58,12 @@ pixel_accuracy       72.40
  
 mean_iou             69.67
 
+mean_IOU             69.67
+ 
+mean_ACC             88.69 
+
+mean_BER             14.50
+
 # psp_edge_v2
 在edge_c1的基础上，不叠加feature，edge branch只影响backbone。
 
@@ -62,6 +80,12 @@ pixel_accuracy       74.85
  
 mean_iou             72.01
 
+mean_IOU             72.01
+ 
+mean_ACC             89.68 
+
+mean_BER             13.18
+
 # psp_edge_depth
 loss mask:1  edge:10  depth:1e-4
 
@@ -76,3 +100,18 @@ mean_iou             71.64
 mean_psnr            19.58
  
 mean_ssim            0.8674
+
+mean_IOU             71.64
+ 
+mean_ACC             89.42 
+
+mean_BER             13.25
+
+# psp_edge_depth_v2
+在psp_edge_depth的基础上，用C1作为depth的输入
+
+mean_IOU             74.21 
+
+mean_ACC             90.32 
+
+mean_BER             11.83 

@@ -12,15 +12,15 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.psp_edge_depth as modellib
+import mhy.psp_edge_depth_v2 as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_all_40.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v2")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v2_all_40.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_edge_depth_40")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_edge_depth_v2_40")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -46,11 +46,11 @@ model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 imglist = os.listdir(IMAGE_DIR)
 print("Total {} test images".format(len(imglist)))
 
-pas = []
-ious = []
+IOU = []
+ACC = []
+BER = []
 PSNR = []
 SSIM = []
-
 
 for i, imgname in enumerate(imglist):
 
@@ -89,27 +89,34 @@ for i, imgname in enumerate(imglist):
     skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.jpg"), (255 * predict_edge).astype(np.uint8))
     skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.jpg"), predict_depth.astype(np.uint8))
 
-    pa = evaluation.pixel_accuracy(predict_mask, gt_mask)
-    IoU = evaluation.IoU(predict_mask, gt_mask)
+    iou = evaluation.iou(predict_mask, gt_mask)
+    acc = evaluation.accuracy(predict_mask, gt_mask)
+    ber = evaluation.ber(predict_mask, gt_mask)
     psnr = skimage.measure.compare_psnr(gt_depth, predict_depth)
     ssim = skimage.measure.compare_ssim(gt_depth, predict_depth)
 
-    print("pixel accuracy : {}".format(pa))
-    print("IOU            : {}".format(IoU))
-    print("psnr           : {}".format(psnr))
-    print("ssim           : {}".format(ssim))
-    pas.append(pa)
-    ious.append(IoU)
+    print("iou : {}".format(iou))
+    print("acc : {}".format(acc))
+    print("ber : {}".format(ber))
+    print("psnr : {}".format(psnr))
+    print("ssim : {}".format(ssim))
+    IOU.append(iou)
+    ACC.append(acc)
+    BER.append(ber)
     PSNR.append(psnr)
     SSIM.append(ssim)
 
-pixel_accuracy = 100 * sum(pas)/len(pas)
-mean_iou = 100 * sum(ious)/len(ious)
-mean_psnr = sum(PSNR)/len(PSNR)
-mean_ssim = sum(SSIM)/len(SSIM)
+mean_IOU = 100 * sum(IOU)/len(IOU)
+mean_ACC = 100 * sum(ACC)/len(ACC)
+mean_BER = 100 * sum(BER)/len(BER)
+mean_PSNR = sum(PSNR)/len(PSNR)
+mean_SSIM = sum(SSIM)/len(SSIM)
 
-print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.4f}".
-      format("pixel_accuracy", pixel_accuracy, "mean_iou", mean_iou, "mean_psnr", mean_psnr, "mean_ssim", mean_ssim))
+# print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
+#       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
+print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.4f}".
+      format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
+             "mean_PSNR", mean_PSNR, "mean_SSIM", mean_SSIM))
 
 
 

@@ -23,5 +23,5 @@ import numpy as np
 
 a = np.array([[1, 255], [0, 1]], dtype=np.uint8)
 b = np.array([[1, 0], [87, 23]], dtype=np.uint8)
-c = np.logical_and(a, b)
+c = np.logical_not(a)
 print(c)

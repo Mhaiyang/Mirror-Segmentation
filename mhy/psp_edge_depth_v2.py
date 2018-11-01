@@ -254,6 +254,8 @@ def edge_loss_graph(input_gt_edge, edge):
     P = tf.count_nonzero(input_gt_edge, [0, 1])
     N = tf.subtract(tf.convert_to_tensor(327680, tf.int64), P)
     weight = tf.div(N, P)
+    total_number = tf.constant(327680, dtype=tf.int64)
+    coefficient = tf.div(P, total_number)
 
     gt_edge = K.cast(input_gt_edge, tf.float32)
 
@@ -261,6 +263,7 @@ def edge_loss_graph(input_gt_edge, edge):
 
     # loss = K.binary_crossentropy(target=gt_edge, output=edge)
     loss = my_weighted_binary_crossentropy(target=gt_edge, output=edge, weight=weight)
+    loss = tf.mul(coefficient, loss)
     loss = K.mean(loss)
 
     return loss
@@ -297,12 +300,15 @@ def mask_loss_graph(input_gt_mask, pred_masks):
     P = tf.count_nonzero(input_gt_mask, [0, 1])
     N = tf.subtract(tf.convert_to_tensor(327680, tf.int64), P)
     weight = tf.div(N, P)
+    total_number = tf.constant(327680, dtype=tf.int64)
+    coefficient = tf.div(P, total_number)
 
     target_masks = K.cast(input_gt_mask, tf.float32)
 
     pred_masks = K.squeeze(pred_masks, -1)
 
     loss = my_weighted_binary_crossentropy(target=target_masks, output=pred_masks, weight=weight)
+    loss = tf.mul(coefficient, loss)
     loss = K.mean(loss)
 
     return loss
