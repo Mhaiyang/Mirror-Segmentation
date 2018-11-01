@@ -211,28 +211,30 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
 ############################################################
 #  Loss Functions
 ############################################################
-def semantic_loss_graph(input_gt_mask, semantic):
-    """Mask binary cross-entropy loss for the semantic head.
+def my_weighted_binary_crossentropy(target, output, weight, from_logits=False):
+    """Weighted binary crossentropy between an output tensor and a target tensor.
 
-    target_masks: [batch, height, width, 1]. bool. Convert it to
-        a float32 tensor of values 0 or 1.
-    target_class_ids: [batch, num_rois]. Integer class IDs. Zero padded.
-    pred_masks: [batch, proposals, height, width, num_classes] float32 tensor
-                with values from 0 to 1.
+    # Arguments
+        target: A tensor with the same shape as `output`.
+        output: A tensor.
+        from_logits: Whether `output` is expected to be a logits tensor.
+            By default, we consider that `output`
+            encodes a probability distribution.
+
+    # Returns
+        A tensor.
     """
-    # Compute binary cross entropy.
-    # input_gt_mask = tf.expand_dims(input_gt_mask, -1)
-    # gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 80 * tf.ones(2, dtype=tf.int32))
-    # gt_mask = tf.squeeze(gt_mask, -1)
-    # gt_mask = tf.round(gt_mask)
-    gt_mask = K.cast(input_gt_mask, tf.float32)
+    # Note: tf.nn.sigmoid_cross_entropy_with_logits
+    # expects logits, Keras expects probabilities.
+    if not from_logits:
+        # transform back to logits
+        _epsilon = tf.convert_to_tensor(K.epsilon(), output.dtype.base_dtype)
+        output = tf.clip_by_value(output, _epsilon, 1 - _epsilon)
+        output = tf.log(output / (1 - output))
 
-    semantic = K.squeeze(semantic, -1)
+    weight = tf.cast(weight, tf.float32)
 
-    loss = K.binary_crossentropy(target=gt_mask, output=semantic)
-    loss = K.mean(loss)
-
-    return loss
+    return tf.nn.weighted_cross_entropy_with_logits(targets=target, logits=output, pos_weight=weight)
 
 
 def edge_loss_graph(input_gt_edge, edge):
@@ -249,11 +251,16 @@ def edge_loss_graph(input_gt_edge, edge):
     # gt_edge = tf.image.resize_bilinear(tf.cast(input_gt_edge, tf.float32), 80 * tf.ones(2, dtype=tf.int32))
     # gt_edge = tf.squeeze(gt_edge, -1)
     # gt_edge = tf.round(gt_edge)
+    P = tf.count_nonzero(input_gt_edge, [0, 1])
+    N = tf.subtract(tf.convert_to_tensor(327680, tf.int64), P)
+    weight = tf.div(N, P)
+
     gt_edge = K.cast(input_gt_edge, tf.float32)
 
     edge = K.squeeze(edge, -1)
 
-    loss = K.binary_crossentropy(target=gt_edge, output=edge)
+    # loss = K.binary_crossentropy(target=gt_edge, output=edge)
+    loss = my_weighted_binary_crossentropy(target=gt_edge, output=edge, weight=weight)
     loss = K.mean(loss)
 
     return loss
@@ -287,12 +294,15 @@ def mask_loss_graph(input_gt_mask, pred_masks):
     # shape: [batch, roi, num_classes]
     # gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 640 * tf.ones(2, dtype=tf.int32))
     # gt_mask = tf.round(gt_mask)
+    P = tf.count_nonzero(input_gt_mask, [0, 1])
+    N = tf.subtract(tf.convert_to_tensor(327680, tf.int64), P)
+    weight = tf.div(N, P)
 
     target_masks = K.cast(input_gt_mask, tf.float32)
 
     pred_masks = K.squeeze(pred_masks, -1)
 
-    loss = K.binary_crossentropy(target=target_masks, output=pred_masks)
+    loss = my_weighted_binary_crossentropy(target=target_masks, output=pred_masks, weight=weight)
     loss = K.mean(loss)
 
     return loss
