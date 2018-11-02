@@ -232,8 +232,6 @@ def my_weighted_binary_crossentropy(target, output, weight, from_logits=False):
         output = tf.clip_by_value(output, _epsilon, 1 - _epsilon)
         output = tf.log(output / (1 - output))
 
-    weight = tf.cast(weight, tf.float32)
-
     return tf.nn.weighted_cross_entropy_with_logits(targets=target, logits=output, pos_weight=weight)
 
 
@@ -251,11 +249,16 @@ def edge_loss_graph(input_gt_edge, edge):
     # gt_edge = tf.image.resize_bilinear(tf.cast(input_gt_edge, tf.float32), 80 * tf.ones(2, dtype=tf.int32))
     # gt_edge = tf.squeeze(gt_edge, -1)
     # gt_edge = tf.round(gt_edge)
-    P = tf.count_nonzero(input_gt_edge, [0, 1])
-    N = tf.subtract(tf.convert_to_tensor(327680, tf.int64), P)
-    weight = tf.div(N, P)
-    total_number = tf.constant(327680, dtype=tf.int64)
-    coefficient = tf.div(P, total_number)
+    # P shape : [batch, channel]
+    P = tf.count_nonzero(input_gt_edge, [1, 2])
+    P = tf.cast(P, tf.float32)
+    total_number = 327680 * tf.ones(tf.shape(P), dtype=tf.float32)
+    N = total_number - P
+
+    weight = N / P
+    weight = tf.squeeze(weight)
+    coefficient = P / total_number
+    coefficient = tf.squeeze(coefficient)
 
     gt_edge = K.cast(input_gt_edge, tf.float32)
 
@@ -263,7 +266,7 @@ def edge_loss_graph(input_gt_edge, edge):
 
     # loss = K.binary_crossentropy(target=gt_edge, output=edge)
     loss = my_weighted_binary_crossentropy(target=gt_edge, output=edge, weight=weight)
-    loss = tf.mul(coefficient, loss)
+    loss = coefficient * loss
     loss = K.mean(loss)
 
     return loss
@@ -297,18 +300,22 @@ def mask_loss_graph(input_gt_mask, pred_masks):
     # shape: [batch, roi, num_classes]
     # gt_mask = tf.image.resize_bilinear(tf.cast(input_gt_mask, tf.float32), 640 * tf.ones(2, dtype=tf.int32))
     # gt_mask = tf.round(gt_mask)
-    P = tf.count_nonzero(input_gt_mask, [0, 1])
-    N = tf.subtract(tf.convert_to_tensor(327680, tf.int64), P)
-    weight = tf.div(N, P)
-    total_number = tf.constant(327680, dtype=tf.int64)
-    coefficient = tf.div(P, total_number)
+    P = tf.count_nonzero(input_gt_mask, [1, 2])
+    P = tf.cast(P, tf.float32)
+    total_number = 327680 * tf.ones(tf.shape(P), dtype=tf.float32)
+    N = total_number - P
+
+    weight = N / P
+    weight = tf.squeeze(weight)
+    coefficient = P / total_number
+    coefficient = tf.squeeze(coefficient)
 
     target_masks = K.cast(input_gt_mask, tf.float32)
 
     pred_masks = K.squeeze(pred_masks, -1)
 
     loss = my_weighted_binary_crossentropy(target=target_masks, output=pred_masks, weight=weight)
-    loss = tf.mul(coefficient, loss)
+    loss = coefficient * loss
     loss = K.mean(loss)
 
     return loss
