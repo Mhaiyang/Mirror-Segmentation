@@ -115,3 +115,10 @@ mean_IOU             74.21
 mean_ACC             90.32 
 
 mean_BER             11.83 
+
+# mask rcnn
+mean_IOU             78.01 
+
+mean_ACC             88.17 
+
+mean_BER             7.96
