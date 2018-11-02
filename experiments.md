@@ -129,9 +129,11 @@ mean_SSIM            0.8641
 
 # psp_edge_depth_v3
 就是在v2的基础上，将edge分支和depth分支的卷积由三层变为6层，看看加深之后会不会变好
+11.2
 
 # psp_depth
 最原始的psp上增加depth分支，单独看看depth分支的作用
+11.2
 
 # mask rcnn
 mean_IOU             78.01 
