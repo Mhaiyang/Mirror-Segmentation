@@ -116,6 +116,17 @@ mean_ACC             90.32
 
 mean_BER             11.83 
 
+# psp_edge_depth_v2_weighted
+mean_IOU             69.36 
+
+mean_ACC             88.80 
+
+mean_BER             14.72 
+
+mean_PSNR            19.43 
+
+mean_SSIM            0.8641
+
 # mask rcnn
 mean_IOU             78.01 
 
