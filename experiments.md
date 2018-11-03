@@ -141,7 +141,20 @@ mean_SSIM            0.8706
 
 # psp_depth
 最原始的psp上增加depth分支，单独看看depth分支的作用
-11.2
+
+mean_IOU             71.75 
+
+mean_ACC             89.69 
+
+mean_BER             13.48 
+
+mean_PSNR            19.22 
+
+mean_SSIM            0.8609
+
+# psp_dege_v3_no
+在psp_edge_v3的基础上，没有edge监督，看看单纯的用一个skip connection和edge监督有什么区别。
+11.3
 
 # mask rcnn
 mean_IOU             78.01 

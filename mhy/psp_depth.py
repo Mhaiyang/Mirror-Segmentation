@@ -1161,14 +1161,14 @@ class PSP_DEPTH(object):
         if verbose:
             log("molded_images", molded_images)
         # Run object detection
-        predict_mask, edge, depth = self.keras_model.predict([molded_images], verbose=0)
+        predict_mask, depth = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []
         final_mask = self.unmold_detections(predict_mask)
-        final_edge = utils.unmold_edge(edge)
+        # final_edge = utils.unmold_edge(edge)
         final_depth = utils.unmold_depth(depth)
-        results.append({"mask": final_mask, "edge": final_edge, "depth": final_depth})
+        results.append({"mask": final_mask, "depth": final_depth})
 
         return results
 
