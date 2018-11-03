@@ -782,8 +782,8 @@ class PSP_EDGE_DEPTH(object):
         edge_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
                                activation="relu", name="edge_conv3")(edge_conv2)
 
-        edge_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same",
-                                 activation="relu", name="edge_feature")([edge_conv3])
+        edge_feature = KL.Conv2D(256, (4, 4), strides=(4, 4), padding="same",
+                                 activation="relu", name="edge_feature")(edge_conv3)
 
         edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(edge_conv3)
         edge = Interp([640, 640])(edge)
@@ -803,8 +803,8 @@ class PSP_EDGE_DEPTH(object):
         depth_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
                                 activation="relu", name="depth_conv3")(depth_conv2)
 
-        depth_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same",
-                                  activation="relu", name="depth_feature")([depth_conv3])
+        depth_feature = KL.Conv2D(256, (4, 4), strides=(4, 4), padding="same",
+                                  activation="relu", name="depth_feature")(depth_conv3)
 
         depth = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_depth")(depth_conv3)
         depth = Interp([640, 640])(depth)
