@@ -22,16 +22,36 @@
 
 import skimage.io
 import numpy as np
+import matplotlib.image
+from PIL import Image
+#
+# depth = Image.open("/home/taylor/Revisiting_Single_Depth_Estimation/data/mirror_depth2/6_512x640.npy")
+# print(np.max(depth))
 
-depth = skimage.io.imread("/home/taylor/Revisiting_Single_Depth_Estimation/data/mirror_depth/7_640x512.jpg")
-a = np.max(depth)
-b = np.min(depth)
-s = np.shape(depth)
-print(a)
-print(b)
-print(s)
+# depth = np.load("/home/taylor/Revisiting_Single_Depth_Estimation/data/mirror_depth2/6_512x640.npy")
+#
+# a = np.max(depth)
+# b = np.min(depth)
+# s = np.shape(depth)
+# print(a)
+# print(b)
+# print(s)
+
+depth = skimage.io.imread("/media/taylor/YH/Revisiting_Single_Depth_Estimation-master/data/nyu2_train/basement_0001b_out/2.png")
+print(np.max(depth))
+print(np.min(depth))
+
+# matplotlib.image.imsave("/home/taylor/Mirror-Segmentation/data_640/test/mask/3_512x640_json/depth2.png", depth)
+
 #
 # a = np.array([[1, 255], [0, 1]], dtype=np.uint8)
 # b = np.array([[1, 0], [87, 23]], dtype=np.uint8)
 # c = np.logical_not(a)
 # print(c)
+
+#
+# import numpy as np
+#
+# a = 3*np.ones([2 ,2])
+# b = a - 1
+# print(b)

@@ -1145,13 +1145,13 @@ class PSP_EDGE(object):
         if verbose:
             log("molded_images", molded_images)
         # Run object detection
-        predict_mask, edge = self.keras_model.predict([molded_images], verbose=0)
+        predict_mask = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []
         final_mask = self.unmold_detections(predict_mask)
-        final_edge = utils.unmold_edge(edge)
-        results.append({"mask": final_mask, "edge": final_edge})
+        # final_edge = utils.unmold_edge(edge)
+        results.append({"mask": final_mask})
 
         return results
 
