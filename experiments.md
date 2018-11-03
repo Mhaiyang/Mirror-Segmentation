@@ -161,6 +161,14 @@ mean_ACC             90.99
 
 mean_BER             11.02
 
+# psp_v2
+去除了dropout
+11.4
+
+# psp_edge_depth_v4
+复杂的两个分支
+11.4
+
 # mask rcnn
 mean_IOU             78.01 
 
