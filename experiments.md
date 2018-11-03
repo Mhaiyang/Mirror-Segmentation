@@ -154,7 +154,12 @@ mean_SSIM            0.8609
 
 # psp_dege_v3_no
 在psp_edge_v3的基础上，没有edge监督，看看单纯的用一个skip connection和edge监督有什么区别。
-11.3
+
+mean_IOU             75.95
+ 
+mean_ACC             90.99 
+
+mean_BER             11.02
 
 # mask rcnn
 mean_IOU             78.01 
