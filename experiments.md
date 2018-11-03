@@ -129,7 +129,15 @@ mean_SSIM            0.8641
 
 # psp_edge_depth_v3
 就是在v2的基础上，将edge分支和depth分支的卷积由三层变为6层，看看加深之后会不会变好
-11.2
+mean_IOU             72.67 
+
+mean_ACC             90.16 
+
+mean_BER             13.01 
+
+mean_PSNR            19.43 
+
+mean_SSIM            0.8706
 
 # psp_depth
 最原始的psp上增加depth分支，单独看看depth分支的作用
