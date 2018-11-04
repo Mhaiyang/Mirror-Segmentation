@@ -172,7 +172,7 @@ mean_BER             13.62
 
 # psp_edge_depth_v4
 复杂的两个分支
-11.4
+11.4 跑到一半应该是显存不够了。
 
 # psp_v3
 就是最原版的psp，有dropout，看看之前的psp训练的有没有问题。

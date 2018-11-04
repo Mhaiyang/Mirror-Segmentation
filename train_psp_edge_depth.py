@@ -12,8 +12,8 @@ import os
 import mirror
 import mhy.psp_edge_depth_v4 as modellib
 
-# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-# os.environ["CUDA_VISIBLE_DEVICES"] = "6, 7, 8, 9"
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "6, 7, 8, 9"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Root directory of the project

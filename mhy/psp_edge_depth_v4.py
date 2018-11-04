@@ -769,11 +769,9 @@ class PSP_EDGE_DEPTH(object):
         x = KL.Dropout(0.1)(x)
 
         # edge branch. 1/2 of input image
-        edge_c1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="edge_c1")(C1)
-        edge_c2 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same",
-                                     activation="relu", name="edge_c2")(C2)
-        edge_c3 = KL.Conv2DTranspose(256, (8, 8), strides=(4, 4), padding="same",
-                                     activation="relu", name="edge_c3")(C3)
+        edge_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="edge_c1")(C1)
+        edge_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="edge_c2")(C2)
+        edge_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", activation="relu", name="edge_c3")(C3)
         edge_fusion = KL.Concatenate(axis=3, name="edge_fusion")([edge_c1, edge_c2, edge_c3])
         edge_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
                                activation="relu", name="edge_conv1")(edge_fusion)
@@ -782,7 +780,7 @@ class PSP_EDGE_DEPTH(object):
         edge_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
                                activation="relu", name="edge_conv3")(edge_conv2)
 
-        edge_feature = KL.Conv2D(256, (4, 4), strides=(4, 4), padding="same",
+        edge_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same",
                                  activation="relu", name="edge_feature")(edge_conv3)
 
         edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(edge_conv3)
@@ -790,10 +788,9 @@ class PSP_EDGE_DEPTH(object):
         edge = KL.Activation("sigmoid")(edge)
 
         # depth branch. 1/2 of input image
-        depth_c1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="depth_c1")(C1)
-        depth_c2 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same",
-                                      activation="relu", name="depth_c2")(C2)
-        depth_c3 = KL.Conv2DTranspose(256, (8, 8), strides=(4, 4), padding="same",
+        depth_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="depth_c1")(C1)
+        depth_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="depth_c2")(C2)
+        depth_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same",
                                       activation="relu", name="depth_c3")(C3)
         depth_fusion = KL.Concatenate(axis=3, name="depth_fusion")([depth_c1, depth_c2, depth_c3])
         depth_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
@@ -803,7 +800,7 @@ class PSP_EDGE_DEPTH(object):
         depth_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
                                 activation="relu", name="depth_conv3")(depth_conv2)
 
-        depth_feature = KL.Conv2D(256, (4, 4), strides=(4, 4), padding="same",
+        depth_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same",
                                   activation="relu", name="depth_feature")(depth_conv3)
 
         depth = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_depth")(depth_conv3)
