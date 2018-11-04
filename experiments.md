@@ -180,7 +180,10 @@ mean_BER             13.62
 
 # psp_edge_depth_v5
 在v4的基础上，换了最新的depth的gt，并用ln损失代替了mse，也去掉了dropout，算是最好的一个版本，希望结果最好。
-11.4
+11.4 
+1080Ti和服务器上都跑了。
+1080Ti是1:10:10 batch 2
+服务器是1:1:1 batch 4
 
 
 
