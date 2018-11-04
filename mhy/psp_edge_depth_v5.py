@@ -297,7 +297,7 @@ def depth_loss_graph(input_gt_depth, depth):
     # Compute ln(e+0.5).
     depth = K.squeeze(depth, -1)
 
-    loss = K.mean(K.log(K.abs(depth - input_gt_depth) + 0.5), axis=-1)
+    loss = K.mean(K.log(K.abs(depth - input_gt_depth) + 1.0), axis=-1)
 
     return loss
 
