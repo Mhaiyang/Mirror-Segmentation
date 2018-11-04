@@ -170,16 +170,19 @@ mean_ACC             89.04
 
 mean_BER             13.62
 
+# psp_v3
+就是最原版的psp，有dropout，看看之前的psp训练的有没有问题。
+11.4
+
 # psp_edge_depth_v4
 复杂的两个分支
-
 11.4 跑到一半应该是显存不够了。
 
 # psp_edge_depth_v5
 在v4的基础上，换了最新的depth的gt，并用ln损失代替了mse，也去掉了dropout，算是最好的一个版本，希望结果最好。
+11.4
 
-# psp_v3
-就是最原版的psp，有dropout，看看之前的psp训练的有没有问题。
+
 
 
 # mask rcnn
