@@ -18,7 +18,7 @@ class MirrorConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 4
+    GPU_COUNT = 1
     IMAGES_PER_GPU = 1
 
     # Use small images for faster training. Set the limits of the small side
@@ -28,15 +28,15 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    # Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/pspnet101_voc2012.h5"
-    Pretrained_Model_Path = "/root/pspnet101_voc2012.h5"
+    Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/pspnet101_voc2012.h5"
+    # Pretrained_Model_Path = "/root/pspnet101_voc2012.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
     LOSS_WEIGHTS = {
         "mask_loss": 1.,
         "edge_loss": 5.,
-        "depth_loss": 0.0001,
+        "depth_loss": 0.1,
     }
 
     # Use a small epoch since the data is simple
@@ -75,7 +75,8 @@ class MirrorDataset(utils.Dataset):
             image_path = img_folder + "/" + imglist[i]
             mask_path = mask_folder + "/" + filestr + "_json/label8.png"
             edge_path = mask_folder + "/" + filestr + "_json/edge.png"
-            depth_path = mask_folder + "/" + filestr + "_json/depth.png"
+            # depth_path = mask_folder + "/" + filestr + "_json/depth.png"
+            depth_path = img_folder + "/../depth/" + filestr + ".npy"
             if not os.path.exists(mask_path):
                 print("{} is incorrect".format(filestr))
                 continue
@@ -123,9 +124,10 @@ class MirrorDataset(utils.Dataset):
     def load_depth(self, image_id):
         """Load the specified depth and return a [H, W] Numpy array"""
 
-        depth = skimage.io.imread(self.image_info[image_id]['depth_path'])
+        # depth = skimage.io.imread(self.image_info[image_id]['depth_path'])
+        depth = np.load(self.image_info[image_id]['depth_path'])
 
-        return depth.astype(np.uint8)
+        return depth.astype(np.float32)
 
 
 

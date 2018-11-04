@@ -402,6 +402,13 @@ def resize_mask(mask, scale, padding, crop=None):
     return mask
 
 
+def pad_depth(depth, padding):
+
+    depth = np.pad(depth, padding[:2], mode="constant", constant_values=0)
+
+    return depth
+
+
 def minimize_mask(bbox, mask, mini_shape):
     """Resize masks to a smaller version to reduce memory load.
     Mini-masks can be resized back to image scale using expand_masks()
