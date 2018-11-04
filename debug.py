@@ -37,9 +37,19 @@ from PIL import Image
 # print(b)
 # print(s)
 
-depth = skimage.io.imread("/media/taylor/YH/Revisiting_Single_Depth_Estimation-master/data/nyu2_train/basement_0001b_out/2.png")
-print(np.max(depth))
-print(np.min(depth))
+mask = skimage.io.imread("/home/iccd/Mirror-Segmentation/data_640/train/mask/845_512x640_json/label8.png")
+height = np.shape(mask)[0]
+width = np.shape(mask)[1]
+num_obj = np.max(mask)
+output = np.zeros([height, width], dtype=np.uint8)
+for index in range(num_obj):
+    """j is row and i is column"""
+    for i in range(height):
+        for j in range(width):
+            if mask[i, j]:
+                output[i, j] = 255  # [height width channel] i.e. [h, w, c]
+
+skimage.io.imsave("/home/iccd/Desktop/output.png", output)
 
 # matplotlib.image.imsave("/home/taylor/Mirror-Segmentation/data_640/test/mask/3_512x640_json/depth2.png", depth)
 
