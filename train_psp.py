@@ -19,7 +19,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "2, 3, 4, 5"
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_v2")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_v3")
     
 config = mirror.MirrorConfig()
 config.display()
@@ -67,7 +67,7 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=40,
             layers='all')
-model_path = os.path.join(MODEL_DIR, "mirror_psp_v2_all_40.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_v3_all_40.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers 1e-3

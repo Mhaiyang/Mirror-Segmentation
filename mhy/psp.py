@@ -651,7 +651,7 @@ class PSP(object):
         x = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="conv5_4", use_bias=False)(psp)
         x = BN(name="conv5_4_bn")(x)
         x = KL.Activation('relu')(x)
-        # x = KL.Dropout(0.1)(x)
+        x = KL.Dropout(0.1)(x)
 
         x = KL.Conv2D(1, (1, 1), strides=(1, 1), name="conv6_mirror")(x)
         x = Interp([640, 640])(x)
