@@ -48,6 +48,10 @@ mean_ACC             88.49
 
 mean_BER             14.76
 
+第三次训练：psp_v4
+
+11.5
+
 # psp_edge_pooling
 使用的是1/8的C5
 
@@ -186,12 +190,35 @@ mean_BER             13.62
 复杂的两个分支
 11.4 跑到一半应该是显存不够了。
 
+mean_IOU             75.45 
+
+mean_ACC             91.04 
+
+mean_BER             11.33 
+
+mean_PSNR            20.00 
+
+mean_SSIM            0.8650
+
 # psp_edge_depth_v5
 在v4的基础上，换了最新的depth的gt，并用ln损失代替了mse，也去掉了dropout，算是最好的一个版本，希望结果最好。
 11.4 
 1080Ti和服务器上都跑了。
 1080Ti是1:10:10 batch 2
 服务器是1:1:1 batch 4
+
+1080Ti:
+
+mean_IOU             72.94
+ 
+mean_ACC             90.06 
+
+mean_BER             12.46 
+
+mean_MSE             0.08
+
+服务器：
+
 
 
 
