@@ -50,6 +50,12 @@ mean_BER             14.76
 
 第三次训练：psp_v4
 
+mean_IOU             65.98
+ 
+mean_ACC             87.53 
+
+mean_BER             16.51
+
 11.5
 
 # psp_edge_pooling
