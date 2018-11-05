@@ -761,12 +761,6 @@ class DEPTH(object):
             shape=[640, 640, 3], name="input_image", dtype=tf.float32)
 
         if mode == "training":
-            # 1. GT Masks [batch, height, width]
-            input_gt_mask = KL.Input(
-                shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_mask", dtype=tf.uint8)
-            # 2. GT Edge [batch, height, width]
-            input_gt_edge = KL.Input(
-                shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_edge", dtype=tf.uint8)
             # 3. GT Depth [batch, height, width]
             input_gt_depth = KL.Input(
                 shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_depth", dtype=tf.float32)
