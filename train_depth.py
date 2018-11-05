@@ -22,7 +22,7 @@ ROOT_DIR = os.getcwd()
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "log", "depth")
     
-config = mirror.MirrorConfig()
+config = depth.MirrorConfig()
 config.display()
 
 # Configuration
