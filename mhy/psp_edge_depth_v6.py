@@ -820,8 +820,8 @@ class PSP_EDGE_DEPTH(object):
 
         # Decoder prediction.
         # 1/8
-        x = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="conv5_4")(psp_semantic)
-        x = BN(name="conv5_4_bn")(x)
+        x = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="decoder_conv0")(psp_semantic)
+        x = BN(name="decoder_bn0")(x)
         x = KL.Activation('relu')(x)
 
         # 1/4
