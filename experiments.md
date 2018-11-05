@@ -56,8 +56,6 @@ mean_ACC             87.53
 
 mean_BER             16.51
 
-11.5
-
 # psp_edge_pooling
 使用的是1/8的C5
 
