@@ -76,7 +76,7 @@ class MirrorDataset(utils.Dataset):
             mask_path = mask_folder + "/" + filestr + "_json/label8.png"
             edge_path = mask_folder + "/" + filestr + "_json/edge.png"
             # depth_path = mask_folder + "/" + filestr + "_json/depth.png"
-            depth_path = img_folder + "/../depth/" + filestr + ".npy"
+            depth_path = img_folder + "/../depth_arxiv/" + filestr + ".png"
             if not os.path.exists(mask_path):
                 print("{} is incorrect".format(filestr))
                 continue
@@ -125,7 +125,8 @@ class MirrorDataset(utils.Dataset):
         """Load the specified depth and return a [H, W] Numpy array"""
 
         # depth = skimage.io.imread(self.image_info[image_id]['depth_path'])
-        depth = np.load(self.image_info[image_id]['depth_path'])
+        depth = skimage.io.imread(self.image_info[image_id]['depth_path'])
+        depth = (depth.astype(np.float32)) / 65535.0
 
         return depth.astype(np.float32)
 
