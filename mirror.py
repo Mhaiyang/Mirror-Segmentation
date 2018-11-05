@@ -46,7 +46,7 @@ class MirrorConfig(Config):
     VALIDATION_STEPS = int(247/(GPU_COUNT*IMAGES_PER_GPU))
 
     # Learning rate
-    LEARNING_RATE = 0.001
+    LEARNING_RATE = 0.01
 
 
 # Dataset

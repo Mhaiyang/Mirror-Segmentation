@@ -454,24 +454,18 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
             if b == 0:
                 batch_images = np.zeros(
                     (batch_size,) + image.shape, dtype=np.float32)
-                batch_gt_masks = np.zeros(
-                    (batch_size, gt_masks.shape[0], gt_masks.shape[1]), dtype=gt_masks.dtype)
-                batch_gt_edge = np.zeros(
-                    (batch_size, gt_edge.shape[0], gt_edge.shape[1]), dtype=gt_edge.dtype)
                 batch_gt_depth = np.zeros(
                     (batch_size, gt_depth.shape[0], gt_depth.shape[1]), dtype=gt_depth.dtype)
 
             # Add to batch
             batch_images[b] = mold_image(image.astype(np.float32), config)
-            batch_gt_masks[b] = gt_masks
-            batch_gt_edge[b] = gt_edge
             batch_gt_depth[b] = gt_depth
 
             b += 1
 
             # Batch full?
             if b >= batch_size:
-                inputs = [batch_images, batch_gt_masks, batch_gt_edge, batch_gt_depth]
+                inputs = [batch_images, batch_gt_depth]
                 outputs = []
 
                 yield inputs, outputs
@@ -803,7 +797,7 @@ class DEPTH(object):
             model.load_weights(self.config.Pretrained_Model_Path, by_name=True)
 
         else:
-            model = KM.Model(input_image, [depth], name='DEPTH')
+            model = KM.Model(input_image, depth, name='DEPTH')
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
