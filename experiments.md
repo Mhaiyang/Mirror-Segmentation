@@ -231,7 +231,17 @@ mean_BER             12.06
 
 mean_MSE             7.14
 
+# psp_edge_depth_v6
 
+重新设计的pipeline，有大的skip connection。
+
+11.5
+
+# depth
+
+看看能不能学镜子区域平均后的深度图。
+
+11.5
 
 
 # mask rcnn
