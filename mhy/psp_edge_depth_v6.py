@@ -835,7 +835,7 @@ class PSP_EDGE_DEPTH(object):
         # 1/2
         x = KL.Conv2DTranspose(128, (3, 3), strides=2, padding="same", activation="relu", name="decoder_conv2_1")(x)
         x = KL.Add(name="addc1")([x, C1])
-        x = KL.Conv2D(1, (3, 3), padding="same", name="decoder_conv2_2")
+        x = KL.Conv2D(1, (3, 3), padding="same", name="decoder_conv2_2")(x)
         x = Interp([640, 640])(x)
         predict_mask = KL.Activation("sigmoid")(x)
 
