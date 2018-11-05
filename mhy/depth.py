@@ -786,7 +786,7 @@ class DEPTH(object):
         depth_conv = KL.Activation("relu")(depth_conv)
 
         # Decoder prediction.
-        x = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="conv5_4")(res)
+        x = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="decoder_conv0")(res)
         x = KL.Conv2DTranspose(256, (3, 3), strides=2, padding="same", name="decoder_conv1")(x)
         x = BN(name="decoder_bn")(x)
         x = KL.Activation("relu")(x)
