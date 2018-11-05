@@ -12,18 +12,18 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 import matplotlib.image
-import matplotlib.pyplot as plt
-plt.set_cmap("jet")
+# import matplotlib.pyplot as plt
+# plt.set_cmap("jet")
 # Important, need change when test different models.
-import mhy.psp_edge_depth_v5 as modellib
+import mhy.psp as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v5")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v5_all_40.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_v4")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_v4_all_40.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_edge_depth_v5_40")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_psp_v4_40")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -41,7 +41,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.PSP_EDGE_DEPTH(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.PSP(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 
@@ -73,7 +73,7 @@ for i, imgname in enumerate(imglist):
     gt_mask = evaluation.get_mask(imgname, MASK_DIR)
     # gt_depth = skimage.io.imread(MASK_DIR + "/" + imgname[:-4] + "_json/depth.png")
     # gt_depth = skimage.io.imread(MASK_DIR + "/" + imgname[:-4] + "_json/depth.png")
-    gt_depth = np.load("/media/taylor/mhy/depth_mirror/test/" + imgname[:-4] + ".npy")
+    # gt_depth = np.load("/media/taylor/mhy/depth_mirror/test/" + imgname[:-4] + ".npy")
     predict_mask_square = r['mask'][0, :, :, 0]
 
     height = gt_mask.shape[0]
@@ -84,51 +84,51 @@ for i, imgname in enumerate(imglist):
         predict_mask = predict_mask_square[64:576, :]
 
     # # if have edge branch
-    if height > width:
-        predict_edge = r["edge"][0, :, :, 0][:, 64:576]
-        predict_depth = r["depth"][0, :, :, 0][:, 64:576]
-    elif height < width:
-        predict_edge = r["edge"][0, :, :, 0][64:576, :]
-        predict_depth = r["depth"][0, :, :, 0][64:576, :]
-    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.jpg"), (255 * predict_edge).astype(np.uint8))
+    # if height > width:
+    #     predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+    #     predict_depth = r["depth"][0, :, :, 0][:, 64:576]
+    # elif height < width:
+    #     predict_edge = r["edge"][0, :, :, 0][64:576, :]
+    #     predict_depth = r["depth"][0, :, :, 0][64:576, :]
+    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.jpg"), (255 * predict_edge).astype(np.uint8))
     # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.jpg"), predict_depth.astype(np.uint8))
-    matplotlib.image.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth)
+    # matplotlib.image.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth)
 
     iou = evaluation.iou(predict_mask, gt_mask)
     acc = evaluation.accuracy(predict_mask, gt_mask)
     ber = evaluation.ber(predict_mask, gt_mask)
-    mse = skimage.measure.compare_mse(gt_depth, predict_depth)
+    # mse = skimage.measure.compare_mse(gt_depth, predict_depth)
     # ssim = skimage.measure.compare_ssim(gt_depth, predict_depth)
 
     print("iou : {}".format(iou))
     print("acc : {}".format(acc))
     print("ber : {}".format(ber))
-    print("mse : {}".format(mse))
+    # print("mse : {}".format(mse))
     # print("psnr : {}".format(psnr))
     # print("ssim : {}".format(ssim))
     IOU.append(iou)
     ACC.append(acc)
     BER.append(ber)
-    MSE.append(mse)
+    # MSE.append(mse)
     # PSNR.append(psnr)
     # SSIM.append(ssim)
 
 mean_IOU = 100 * sum(IOU)/len(IOU)
 mean_ACC = 100 * sum(ACC)/len(ACC)
 mean_BER = 100 * sum(BER)/len(BER)
-mean_MSE = 100 * sum(MSE)/len(MSE)
+# mean_MSE = 100 * sum(MSE)/len(MSE)
 # mean_PSNR = sum(PSNR)/len(PSNR)
 # mean_SSIM = sum(SSIM)/len(SSIM)
 
-# print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
-#       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
+print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
+      format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
 # print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.4f}".
 #       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
 #              "mean_PSNR", mean_PSNR, "mean_SSIM", mean_SSIM))
 
-print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
-      format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
-             "mean_MSE", mean_MSE))
+# print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
+#       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
+#              "mean_MSE", mean_MSE))
 
 
 
