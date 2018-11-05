@@ -40,6 +40,14 @@ mean_ACC             86.30
 
 mean_BER             18.28
 
+第二次训练：psp_v3
+
+mean_IOU             68.96 
+
+mean_ACC             88.49 
+
+mean_BER             14.76
+
 # psp_edge_pooling
 使用的是1/8的C5
 
@@ -172,7 +180,7 @@ mean_BER             13.62
 
 # psp_v3
 就是最原版的psp，有dropout，看看之前的psp训练的有没有问题。
-11.4
+居然结果比之前训练的高。
 
 # psp_edge_depth_v4
 复杂的两个分支
