@@ -116,7 +116,7 @@ for i, imgname in enumerate(imglist):
 mean_IOU = 100 * sum(IOU)/len(IOU)
 mean_ACC = 100 * sum(ACC)/len(ACC)
 mean_BER = 100 * sum(BER)/len(BER)
-mean_MSE = sum(MSE)/len(MSE)
+mean_MSE = 100 * sum(MSE)/len(MSE)
 # mean_PSNR = sum(PSNR)/len(PSNR)
 # mean_SSIM = sum(SSIM)/len(SSIM)
 

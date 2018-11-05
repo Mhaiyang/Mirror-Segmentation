@@ -219,6 +219,13 @@ mean_MSE             0.08
 
 服务器：
 
+mean_IOU             73.77
+ 
+mean_ACC             90.32 
+
+mean_BER             12.06 
+
+mean_MSE             7.14
 
 
 
