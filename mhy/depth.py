@@ -795,7 +795,7 @@ class DEPTH(object):
         x = KL.Concatenate(axis=3, name="fusion")([depth_conv, x])
         x = KL.Conv2D(256, (3, 3), strides=1, padding="same", activation="relu", name="final_conv1")(x)
         x = KL.Conv2D(256, (3, 3), strides=1, padding="same", activation="relu", name="final_conv2")(x)
-        x = KL.Conv2D(256, (3, 3), strides=1, padding="same", activation="relu", name="final_conv3")(x)
+        x = KL.Conv2D(1, (3, 3), strides=1, padding="same", activation="relu", name="final_conv3")(x)
         depth = Interp([640, 640])(x)
 
         if mode == "training":
