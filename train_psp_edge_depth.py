@@ -10,17 +10,17 @@
 """
 import os
 import mirror
-import mhy.psp_edge_depth_v5 as modellib
+import mhy.psp_edge_depth_v6 as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "6, 7, 8, 9"
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "6, 7, 8, 9"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v6")
     
 config = mirror.MirrorConfig()
 config.display()
@@ -68,7 +68,7 @@ model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=40,
             layers='all')
-model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v5_all_40.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v6_all_40.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers 1e-3

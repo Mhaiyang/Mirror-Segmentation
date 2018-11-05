@@ -24,6 +24,8 @@ import skimage.io
 import numpy as np
 import matplotlib.image
 from PIL import Image
+import matplotlib.pyplot as plt
+plt.set_cmap("jet")
 #
 # depth = Image.open("/home/taylor/Revisiting_Single_Depth_Estimation/data/mirror_depth2/6_512x640.npy")
 # print(np.max(depth))
@@ -37,31 +39,24 @@ from PIL import Image
 # print(b)
 # print(s)
 
-mask = skimage.io.imread("/home/iccd/Mirror-Segmentation/data_640/train/mask/845_512x640_json/label8.png")
-height = np.shape(mask)[0]
-width = np.shape(mask)[1]
-num_obj = np.max(mask)
-output = np.zeros([height, width], dtype=np.uint8)
-for index in range(num_obj):
-    """j is row and i is column"""
-    for i in range(height):
-        for j in range(width):
-            if mask[i, j]:
-                output[i, j] = 255  # [height width channel] i.e. [h, w, c]
-
-skimage.io.imsave("/home/iccd/Desktop/output.png", output)
-
-# matplotlib.image.imsave("/home/taylor/Mirror-Segmentation/data_640/test/mask/3_512x640_json/depth2.png", depth)
-
+# mask = skimage.io.imread("/home/taylor/Mirror-Segmentation/data_640/train/mask/1_512x640_json/depth.png")
+# height = np.shape(mask)[0]
+# width = np.shape(mask)[1]
+# num_obj = np.max(mask)
+# output = np.zeros([height, width], dtype=np.uint8)
+# for index in range(num_obj):
+#     """j is row and i is column"""
+#     for i in range(height):
+#         for j in range(width):
+#             if mask[i, j]:
+#                 output[i, j] = 255  # [height width channel] i.e. [h, w, c]
 #
-# a = np.array([[1, 255], [0, 1]], dtype=np.uint8)
-# b = np.array([[1, 0], [87, 23]], dtype=np.uint8)
-# c = np.logical_not(a)
-# print(c)
+# skimage.io.imsave("/home/iccd/Desktop/output.png", output)
 
-#
-# import numpy as np
-#
-# a = 3*np.ones([2 ,2])
-# b = a - 1
-# print(b)
+depth = skimage.io.imread("/media/taylor/mhy/depth2/test/6_512x640.png")
+print(np.max(depth))
+print(np.min(depth))
+print(depth.dtype)
+
+# matplotlib.image.imsave("/home/taylor/Desktop/1.png", depth)
+
