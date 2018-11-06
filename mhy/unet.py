@@ -424,7 +424,8 @@ class UNET(object):
                 shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_mask", dtype=tf.uint8)
 
         # Build UNet.
-        conv1 = KL.Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(input_image)
+        input_image_bn = KL.BatchNormalization(name="input_bn")(input_image)
+        conv1 = KL.Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(input_image_bn)
         conv1 = KL.Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv1)
         pool1 = KL.MaxPooling2D(pool_size=(2, 2))(conv1)
         conv2 = KL.Conv2D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal')(pool1)
@@ -470,7 +471,8 @@ class UNET(object):
         conv9 = KL.Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge9)
         conv9 = KL.Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
         conv9 = KL.Conv2D(2, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
-        predict_mask = KL.Conv2D(1, 1, activation='sigmoid')(conv9)
+        conv9 = KL.Conv2D(1, 1)(conv9)
+        predict_mask = KL.Activation("sigmoid")(conv9)
 
         if mode == "training":
             # Losses

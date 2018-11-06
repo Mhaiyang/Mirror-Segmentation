@@ -11,19 +11,16 @@ import skimage.measure
 import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
-import matplotlib.image
-# import matplotlib.pyplot as plt
-# plt.set_cmap("jet")
 # Important, need change when test different models.
-import mhy.depth as modellib
+import mhy.unet as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "depth")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "depth_all_60.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "unet")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_unet_all_30.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_depth_60")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_unet_30")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -41,7 +38,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.DEPTH(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.UNET(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 
@@ -52,8 +49,6 @@ print("Total {} test images".format(len(imglist)))
 IOU = []
 ACC = []
 BER = []
-PSNR = []
-SSIM = []
 MSE = []
 
 for i, imgname in enumerate(imglist):
@@ -64,7 +59,7 @@ for i, imgname in enumerate(imglist):
     results = model.detect(imgname, [image], verbose=1)
     r = results[0]
     # Save mask and masked image.
-    # visualize.save_mask_and_masked_image(imgname, image, r['mask'], OUTPUT_PATH)
+    visualize.save_mask_and_masked_image(imgname, image, r['mask'], OUTPUT_PATH)
 
     ###########################################################################
     ################  Quantitative Evaluation for Single Image ################
@@ -73,56 +68,56 @@ for i, imgname in enumerate(imglist):
     gt_mask = evaluation.get_mask(imgname, MASK_DIR)
     # gt_depth = skimage.io.imread(MASK_DIR + "/" + imgname[:-4] + "_json/depth.png")
     # gt_depth = skimage.io.imread(MASK_DIR + "/" + imgname[:-4] + "_json/depth.png")
-    gt_depth = skimage.io.imread("/media/taylor/mhy/depth2/test/" + imgname[:-4] + ".png")
+    # gt_depth = skimage.io.imread("/media/taylor/mhy/depth2/test/" + imgname[:-4] + ".png")
     # gt_depth = (((gt_depth.astype(np.float32)) / 65535.0)*255).astype(np.uint8)
-    # predict_mask_square = r['mask'][0, :, :, 0]
+    predict_mask_square = r['mask'][0, :, :, 0]
 
     height = gt_mask.shape[0]
     width = gt_mask.shape[1]
-    # if height > width:
-    #     predict_mask = predict_mask_square[:, 64:576]
-    # elif height < width:
-    #     predict_mask = predict_mask_square[64:576, :]
+    if height > width:
+        predict_mask = predict_mask_square[:, 64:576]
+    elif height < width:
+        predict_mask = predict_mask_square[64:576, :]
 
     # # if have edge branch
-    if height > width:
-        # predict_edge = r["edge"][0, :, :, 0][:, 64:576]
-        predict_depth = r["depth"][0, :, :, 0][:, 64:576]
-    elif height < width:
-        # predict_edge = r["edge"][0, :, :, 0][64:576, :]
-        predict_depth = r["depth"][0, :, :, 0][64:576, :]
+    # if height > width:
+    #     # predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+    #     predict_depth = r["depth"][0, :, :, 0][:, 64:576]
+    # elif height < width:
+    #     # predict_edge = r["edge"][0, :, :, 0][64:576, :]
+    #     predict_depth = r["depth"][0, :, :, 0][64:576, :]
     # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"), predict_edge)
-    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth)
+    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth)
     # matplotlib.image.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth)
 
-#     iou = evaluation.iou(predict_mask, gt_mask)
-#     acc = evaluation.accuracy(predict_mask, gt_mask)
-#     ber = evaluation.ber(predict_mask, gt_mask)
-#     mse = skimage.measure.compare_mse(gt_depth, predict_depth)
-#     # ssim = skimage.measure.compare_ssim(gt_depth, predict_depth)
-#
-#     print("iou : {}".format(iou))
-#     print("acc : {}".format(acc))
-#     print("ber : {}".format(ber))
-#     print("mse : {}".format(mse))
-#     # print("psnr : {}".format(psnr))
-#     # print("ssim : {}".format(ssim))
-#     IOU.append(iou)
-#     ACC.append(acc)
-#     BER.append(ber)
-#     MSE.append(mse)
-#     # PSNR.append(psnr)
-#     # SSIM.append(ssim)
-#
-# mean_IOU = 100 * sum(IOU)/len(IOU)
-# mean_ACC = 100 * sum(ACC)/len(ACC)
-# mean_BER = 100 * sum(BER)/len(BER)
+    iou = evaluation.iou(predict_mask, gt_mask)
+    acc = evaluation.accuracy(predict_mask, gt_mask)
+    ber = evaluation.ber(predict_mask, gt_mask)
+    # mse = skimage.measure.compare_mse(gt_depth, predict_depth)
+    # ssim = skimage.measure.compare_ssim(gt_depth, predict_depth)
+
+    print("iou : {}".format(iou))
+    print("acc : {}".format(acc))
+    print("ber : {}".format(ber))
+    # print("mse : {}".format(mse))
+    # print("psnr : {}".format(psnr))
+    # print("ssim : {}".format(ssim))
+    IOU.append(iou)
+    ACC.append(acc)
+    BER.append(ber)
+    # MSE.append(mse)
+    # PSNR.append(psnr)
+    # SSIM.append(ssim)
+
+mean_IOU = 100 * sum(IOU)/len(IOU)
+mean_ACC = 100 * sum(ACC)/len(ACC)
+mean_BER = 100 * sum(BER)/len(BER)
 # mean_MSE = 100 * sum(MSE)/len(MSE)
-# # mean_PSNR = sum(PSNR)/len(PSNR)
-# # mean_SSIM = sum(SSIM)/len(SSIM)
-#
-# # print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
-# #       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
+# mean_PSNR = sum(PSNR)/len(PSNR)
+# mean_SSIM = sum(SSIM)/len(SSIM)
+
+print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
+      format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
 # # print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.4f}".
 # #       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
 # #              "mean_PSNR", mean_PSNR, "mean_SSIM", mean_SSIM))
