@@ -243,6 +243,9 @@ mean_MSE             7.14
 
 11.5
 
+# unet
+11.5
+
 
 # mask rcnn
 mean_IOU             78.01 
