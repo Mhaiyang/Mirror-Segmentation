@@ -19,8 +19,8 @@ class MirrorConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 2
-    IMAGES_PER_GPU = 2
+    GPU_COUNT = 4
+    IMAGES_PER_GPU = 1
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
@@ -36,8 +36,8 @@ class MirrorConfig(Config):
 
     LOSS_WEIGHTS = {
         "mask_loss": 1.,
-        # "edge_loss": 10.,
-        # "depth_loss": 10.,
+        "edge_loss": 10.,
+        "depth_loss": 10.,
     }
 
     # Use a small epoch since the data is simple
