@@ -65,15 +65,15 @@ if init_with == "last":
 # 2. Fine tune all layers 1e-3
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=60,
+            epochs=20,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_unet_all_60.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_unet_all_20.h5")
 model.keras_model.save_weights(model_path)
 
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=80,
+            epochs=30,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_unet_all_80.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_unet_all_30.h5")
 model.keras_model.save_weights(model_path)
 

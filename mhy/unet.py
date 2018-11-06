@@ -470,8 +470,7 @@ class UNET(object):
         conv9 = KL.Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge9)
         conv9 = KL.Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
         conv9 = KL.Conv2D(2, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
-        conv10 = KL.Conv2D(1, 1, activation='sigmoid')(conv9)
-        predict_mask = conv10
+        predict_mask = KL.Conv2D(1, 1, activation='sigmoid')(conv9)
 
         if mode == "training":
             # Losses
