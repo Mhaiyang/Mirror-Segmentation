@@ -287,20 +287,6 @@ def depth_loss_graph(input_gt_depth, depth):
 
     return loss
 
-#
-# def depth_loss_graph(input_gt_depth, depth):
-#     """Mask mean square error loss for the depth head.
-#
-#     input_gt_depth: [batch, height, width]. tf.uint8. convert it to tf.float32
-#     depth: [batch, height, width, 1] float32 tensor. Generated from depth branch.
-#     """
-#     # Compute ln(e+0.5).
-#     depth = K.squeeze(depth, -1)
-#
-#     loss = K.mean(K.log(K.abs(depth - input_gt_depth) + 1.0), axis=-1)
-#
-#     return loss
-
 
 def mask_loss_graph(input_gt_mask, pred_masks):
     """Mask binary cross-entropy loss for the masks head.
@@ -454,18 +440,24 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
             if b == 0:
                 batch_images = np.zeros(
                     (batch_size,) + image.shape, dtype=np.float32)
+                batch_gt_masks = np.zeros(
+                    (batch_size, gt_masks.shape[0], gt_masks.shape[1]), dtype=gt_masks.dtype)
+                batch_gt_edge = np.zeros(
+                    (batch_size, gt_edge.shape[0], gt_edge.shape[1]), dtype=gt_edge.dtype)
                 batch_gt_depth = np.zeros(
                     (batch_size, gt_depth.shape[0], gt_depth.shape[1]), dtype=gt_depth.dtype)
 
             # Add to batch
             batch_images[b] = mold_image(image.astype(np.float32), config)
+            batch_gt_masks[b] = gt_masks
+            batch_gt_edge[b] = gt_edge
             batch_gt_depth[b] = gt_depth
 
             b += 1
 
             # Batch full?
             if b >= batch_size:
-                inputs = [batch_images, batch_gt_depth]
+                inputs = [batch_images, batch_gt_masks, batch_gt_edge, batch_gt_depth]
                 outputs = []
 
                 yield inputs, outputs
@@ -716,7 +708,7 @@ def build_pyramid_pooling_module(res, input_shape, branch="_semantic"):
 #  Network Class
 ############################################################
 
-class DEPTH(object):
+class PSP_EDGE_DEPTH(object):
     """
     The actual Keras model is in the keras_model property.
     """
@@ -755,49 +747,93 @@ class DEPTH(object):
             shape=[640, 640, 3], name="input_image", dtype=tf.float32)
 
         if mode == "training":
+            # 1. GT Masks [batch, height, width]
+            input_gt_mask = KL.Input(
+                shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_mask", dtype=tf.uint8)
+            # 2. GT Edge [batch, height, width]
+            input_gt_edge = KL.Input(
+                shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_edge", dtype=tf.uint8)
             # 3. GT Depth [batch, height, width]
             input_gt_depth = KL.Input(
                 shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1]], name="input_gt_depth", dtype=tf.float32)
 
         # Build the backbone layers.
-        # 2048, 128, 256, 512
         res, C1, C2, C3 = ResNet(input_image, layers=101)
 
-        # depth branch. 1/4 of input image
+        # semantic branch
+        psp_semantic = build_pyramid_pooling_module(res, [640, 640], branch="_semantic")
+
+        x = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="conv5_4", use_bias=False)(psp_semantic)
+        x = BN(name="conv5_4_bn")(x)
+        x = KL.Activation('relu')(x)
+        x = KL.Dropout(0.1)(x)
+
+        # edge branch. 1/2 of input image
+        edge_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="edge_c1")(C1)
+        edge_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="edge_c2")(C2)
+        edge_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", activation="relu", name="edge_c3")(C3)
+        edge_fusion = KL.Concatenate(axis=3, name="edge_fusion")([edge_c1, edge_c2, edge_c3])
+        edge_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                               activation="relu", name="edge_conv1")(edge_fusion)
+        edge_conv2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                               activation="relu", name="edge_conv2")(edge_conv1)
+        edge_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                               name="edge_conv3")(edge_conv2)
+        edge_conv3 = BN(name="edge_bn")(edge_conv3)
+        edge_conv3 = KL.Activation("relu")(edge_conv3)
+
+        edge_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same",
+                                 activation="relu", name="edge_feature")(edge_conv3)
+
+        edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(edge_conv3)
+        edge = Interp([640, 640])(edge)
+        edge = KL.Activation("sigmoid")(edge)
+
+        # depth branch. 1/2 of input image
         depth_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="depth_c1")(C1)
         depth_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="depth_c2")(C2)
-        depth_c3 = KL.Conv2DTranspose(256, (3, 3), strides=(2, 2), padding="same",
+        depth_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same",
                                       activation="relu", name="depth_c3")(C3)
         depth_fusion = KL.Concatenate(axis=3, name="depth_fusion")([depth_c1, depth_c2, depth_c3])
-        depth_conv = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv")(depth_fusion)
-        depth_conv = BN(name="depth_bn")(depth_conv)
-        depth_conv = KL.Activation("relu")(depth_conv)
+        depth_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                                activation="relu", name="depth_conv1")(depth_fusion)
+        depth_conv2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                                activation="relu", name="depth_conv2")(depth_conv1)
+        depth_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                                name="depth_conv3")(depth_conv2)
+        depth_conv3 = BN(name="depth_bn")(depth_conv3)
+        depth_conv3 = KL.Activation("relu")(depth_conv3)
 
-        # Decoder prediction.
-        x = KL.Conv2D(512, (3, 3), strides=(1, 1), padding="same", name="decoder_conv0")(res)
-        x = KL.Conv2DTranspose(256, (3, 3), strides=2, padding="same", name="decoder_conv1")(x)
-        x = BN(name="decoder_bn")(x)
-        x = KL.Activation("relu")(x)
+        depth_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same",
+                                  activation="relu", name="depth_feature")(depth_conv3)
 
-        # Final prediction.
-        x = KL.Concatenate(axis=3, name="fusion")([depth_conv, x])
-        x = KL.Conv2D(256, (3, 3), strides=1, padding="same", activation="relu", name="final_conv1")(x)
-        x = KL.Conv2D(256, (3, 3), strides=1, padding="same", activation="relu", name="final_conv2")(x)
-        x = KL.Conv2D(1, (3, 3), strides=1, padding="same", activation="relu", name="final_conv3")(x)
-        depth = Interp([640, 640])(x)
+        depth = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_depth")(depth_conv3)
+        depth = Interp([640, 640])(depth)
+
+        # final fusion
+        m = KL.Concatenate(axis=3, name="fusion")([x, edge_feature, depth_feature])
+        m = KL.Conv2D(512, (3, 3), strides=(1, 1), activation="relu", name="final_conv1")(m)
+        m = KL.Conv2D(1, (3, 3), strides=(1, 1), name="final_conv2")(m)
+        m = Interp([640, 640])(m)
+        predict_mask = KL.Activation('sigmoid')(m)
 
         if mode == "training":
+            # middle loss
+            edge_loss = KL.Lambda(lambda x: edge_loss_graph(*x),
+                                  name="edge_loss")([input_gt_edge, edge])
             depth_loss = KL.Lambda(lambda x: depth_loss_graph(*x),
                                    name="depth_loss")([input_gt_depth, depth])
+            # final loss
+            mask_loss = KL.Lambda(lambda x: mask_loss_graph(*x), name="mask_loss")([input_gt_mask, predict_mask])
 
             # Model
-            inputs = [input_image, input_gt_depth]
-            outputs = [depth, depth_loss]
-            model = KM.Model(inputs, outputs, name='DEPTH')
+            inputs = [input_image, input_gt_mask, input_gt_edge, input_gt_depth]
+            outputs = [predict_mask, edge_loss, depth_loss, mask_loss]
+            model = KM.Model(inputs, outputs, name='PSP_EDGE_DEPTH')
             model.load_weights(self.config.Pretrained_Model_Path, by_name=True)
 
         else:
-            model = KM.Model(input_image, depth, name='DEPTH')
+            model = KM.Model(input_image, [predict_mask, edge, depth], name='PSP_EDGE_DEPTH')
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
@@ -895,7 +931,7 @@ class DEPTH(object):
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
         self.keras_model._per_input_losses = {}
-        loss_names = ["depth_loss"]
+        loss_names = ["mask_loss", "edge_loss", "depth_loss"]
         for name in loss_names:
             layer = self.keras_model.get_layer(name)
             if layer.output in self.keras_model.losses:
@@ -1191,13 +1227,14 @@ class DEPTH(object):
         if verbose:
             log("molded_images", molded_images)
         # Run object detection
-        depth = self.keras_model.predict([molded_images], verbose=0)
+        predict_mask, edge, depth = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []
-        # final_mask = self.unmold_detections(predict_mask)
+        final_mask = self.unmold_detections(predict_mask)
+        final_edge = utils.unmold_edge(edge)
         final_depth = utils.unmold_depth(depth)
-        results.append({"depth": final_depth})
+        results.append({"mask": final_mask, "edge": final_edge, "depth": final_depth})
 
         return results
 

@@ -521,7 +521,7 @@ def unmold_depth(depth):
     # final_depth = depth.astype(np.uint8)
 
     # for v5
-    final_depth = depth.astype(np.float32)
+    final_depth = (depth * 255).astype(np.uint8)
 
     return final_depth
 

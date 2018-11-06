@@ -5,6 +5,7 @@ from mhy.config import Config
 import mhy.utils as utils
 import skimage.io
 import skimage.color
+import skimage.transform
 
 
 # Configurations
@@ -76,7 +77,7 @@ class MirrorDataset(utils.Dataset):
             mask_path = mask_folder + "/" + filestr + "_json/label8.png"
             edge_path = mask_folder + "/" + filestr + "_json/edge.png"
             # depth_path = mask_folder + "/" + filestr + "_json/depth.png"
-            depth_path = img_folder + "/../depth_arxiv/" + filestr + ".png"
+            depth_path = img_folder + "/../depth_original/" + filestr + ".png"
             if not os.path.exists(mask_path):
                 print("{} is incorrect".format(filestr))
                 continue
@@ -126,7 +127,7 @@ class MirrorDataset(utils.Dataset):
 
         # depth = skimage.io.imread(self.image_info[image_id]['depth_path'])
         depth = skimage.io.imread(self.image_info[image_id]['depth_path'])
-        depth = (depth.astype(np.float32)) / 65535.0
+        depth = (depth.astype(np.float32)) / 255.0
 
         return depth.astype(np.float32)
 

@@ -235,16 +235,25 @@ mean_MSE             7.14
 
 重新设计的pipeline，有大的skip connection。
 
-11.5
+mean_IOU             56.84 
+
+mean_ACC             84.73 
+
+mean_BER             21.24 
 
 # depth
 
 看看能不能学镜子区域平均后的深度图。
 
-11.5
+结论是学不出来，大的镜子根本不能学到平均值。
+
+# psp_edge_depth_v7
+在v4的基础上，直接学原始的depth。
+
+11.6
 
 # unet
-11.5
+11.6
 
 
 # mask rcnn
