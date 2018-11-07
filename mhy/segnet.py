@@ -524,7 +524,7 @@ class SEGNET(object):
 
         # Build SegNet.
         kernel = 3
-        pool_size = 2
+        pool_size = (2, 2)
 
         conv_1 = KL.Convolution2D(64, (kernel, kernel), padding="same")(input_image)
         conv_1 = KL.BatchNormalization()(conv_1)
