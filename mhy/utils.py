@@ -517,7 +517,7 @@ def unmold_depth(depth):
 
     Returns a binary mask with the same size as the original image.
     """
-    # Final depth
+    # for v4
     # final_depth = depth.astype(np.uint8)
 
     # for v5

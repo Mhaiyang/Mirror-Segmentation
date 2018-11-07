@@ -8,19 +8,20 @@ import os
 import numpy as np
 import skimage.io
 import skimage.measure
+import time
 import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.unet as modellib
+import mhy.psp_edge_depth_v7 as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "unet")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_unet_all_30.h5")
-IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test", "image")
-MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test', "output_unet_30")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v8")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v8_all_40.h5")
+IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test2", "image")
+MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test2", "mask")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test2', "psp_edge_depth_v8")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -38,7 +39,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.UNET(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.PSP_EDGE_DEPTH(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 
@@ -51,14 +52,13 @@ ACC = []
 BER = []
 MSE = []
 
+start = time.time()
 for i, imgname in enumerate(imglist):
 
     print("###############  {}   ###############".format(i+1))
     image = skimage.io.imread(os.path.join(IMAGE_DIR, imgname))
-    # Run detection
     results = model.detect(imgname, [image], verbose=1)
     r = results[0]
-    # Save mask and masked image.
     visualize.save_mask_and_masked_image(imgname, image, r['mask'], OUTPUT_PATH)
 
     ###########################################################################
@@ -68,7 +68,8 @@ for i, imgname in enumerate(imglist):
     gt_mask = evaluation.get_mask(imgname, MASK_DIR)
     # gt_depth = skimage.io.imread(MASK_DIR + "/" + imgname[:-4] + "_json/depth.png")
     # gt_depth = skimage.io.imread(MASK_DIR + "/" + imgname[:-4] + "_json/depth.png")
-    # gt_depth = skimage.io.imread("/media/taylor/mhy/depth2/test/" + imgname[:-4] + ".png")
+    gt_depth = skimage.io.imread("/media/taylor/mhy/depth_original/test/" + imgname[:-4] + ".png")
+    gt_depth = gt_depth.astype(np.uint8)
     # gt_depth = (((gt_depth.astype(np.float32)) / 65535.0)*255).astype(np.uint8)
     predict_mask_square = r['mask'][0, :, :, 0]
 
@@ -79,52 +80,51 @@ for i, imgname in enumerate(imglist):
     elif height < width:
         predict_mask = predict_mask_square[64:576, :]
 
-    # # if have edge branch
-    # if height > width:
-    #     # predict_edge = r["edge"][0, :, :, 0][:, 64:576]
-    #     predict_depth = r["depth"][0, :, :, 0][:, 64:576]
-    # elif height < width:
-    #     # predict_edge = r["edge"][0, :, :, 0][64:576, :]
-    #     predict_depth = r["depth"][0, :, :, 0][64:576, :]
-    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"), predict_edge)
-    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth)
-    # matplotlib.image.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth)
+    # if have edge branch
+    if height > width:
+        predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+        predict_depth = r["depth"][0, :, :, 0][:, 64:576]
+    elif height < width:
+        predict_edge = r["edge"][0, :, :, 0][64:576, :]
+        predict_depth = r["depth"][0, :, :, 0][64:576, :]
+    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
+    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth.astype(np.uint8))
 
     iou = evaluation.iou(predict_mask, gt_mask)
     acc = evaluation.accuracy(predict_mask, gt_mask)
     ber = evaluation.ber(predict_mask, gt_mask)
-    # mse = skimage.measure.compare_mse(gt_depth, predict_depth)
-    # ssim = skimage.measure.compare_ssim(gt_depth, predict_depth)
+    mse = skimage.measure.compare_mse(gt_depth, predict_depth)
 
     print("iou : {}".format(iou))
     print("acc : {}".format(acc))
     print("ber : {}".format(ber))
-    # print("mse : {}".format(mse))
-    # print("psnr : {}".format(psnr))
-    # print("ssim : {}".format(ssim))
+    print("mse : {}".format(mse))
     IOU.append(iou)
     ACC.append(acc)
     BER.append(ber)
-    # MSE.append(mse)
-    # PSNR.append(psnr)
-    # SSIM.append(ssim)
+    MSE.append(mse)
+
+end = time.time()
+print("Time is : {}".format(start - end))
 
 mean_IOU = 100 * sum(IOU)/len(IOU)
 mean_ACC = 100 * sum(ACC)/len(ACC)
 mean_BER = 100 * sum(BER)/len(BER)
-# mean_MSE = 100 * sum(MSE)/len(MSE)
-# mean_PSNR = sum(PSNR)/len(PSNR)
-# mean_SSIM = sum(SSIM)/len(SSIM)
+mean_MSE = sum(MSE)/len(MSE)
 
-print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
-      format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
+print(len(IOU))
+print(len(ACC))
+print(len(BER))
+
+# print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
+#       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
 # # print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.4f}".
 # #       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
 # #              "mean_PSNR", mean_PSNR, "mean_SSIM", mean_SSIM))
 #
-# print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
-#       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
-#              "mean_MSE", mean_MSE))
+print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
+      format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
+             "mean_MSE", mean_MSE))
 
 
 

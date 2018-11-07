@@ -250,12 +250,12 @@ mean_BER             21.24
 # psp_edge_depth_v7
 在v4的基础上，直接学原始的depth。1e-3.
 
-11.6
+不好，跟v4差很多。
 
 # psp_edge_depth_v8
 在v7的基础上，将c1，c2，c3，c4都叠加在c5上，然后送入psp。1e-3.
 
-11.6
+啥都没学出来。
 
 # unet
 11.6
