@@ -257,6 +257,10 @@ mean_BER             21.24
 
 啥都没学出来。
 
+# psp_edge_depth_v9
+
+11.7
+
 # unet
 11.6
 

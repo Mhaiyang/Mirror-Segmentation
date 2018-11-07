@@ -23,9 +23,9 @@
 import skimage.io
 import numpy as np
 import matplotlib.image
-from PIL import Image
-import matplotlib.pyplot as plt
-plt.set_cmap("jet")
+# from PIL import Image
+# import matplotlib.pyplot as plt
+# plt.set_cmap("jet")
 #
 # depth = Image.open("/home/taylor/Revisiting_Single_Depth_Estimation/data/mirror_depth2/6_512x640.npy")
 # print(np.max(depth))
@@ -53,10 +53,13 @@ plt.set_cmap("jet")
 #
 # skimage.io.imsave("/home/iccd/Desktop/output.png", output)
 
-depth = skimage.io.imread("/media/taylor/mhy/depth2/test/6_512x640.png")
+depth = skimage.io.imread("/media/taylor/mhy/depth_original/test/1_512x640.png")
 print(np.max(depth))
 print(np.min(depth))
 print(depth.dtype)
-
+depth = (depth.astype(np.float32)) / 255.0
+print(np.max(depth))
+print(np.min(depth))
+print(depth.dtype)
 # matplotlib.image.imsave("/home/taylor/Desktop/1.png", depth)
 
