@@ -677,7 +677,7 @@ def interp_block(prev_layer, level, feature_map_shape, input_shape, branch):
     kernel = (kernel_strides_map[level], kernel_strides_map[level])
     strides = (kernel_strides_map[level], kernel_strides_map[level])
     prev_layer = KL.AveragePooling2D(kernel, strides=strides)(prev_layer)
-    prev_layer = KL.Conv2D(640, (1, 1), strides=(1, 1), name=names[0],
+    prev_layer = KL.Conv2D(512, (1, 1), strides=(1, 1), name=names[0],
                            use_bias=False)(prev_layer)
     prev_layer = BN(name=names[1])(prev_layer)
     prev_layer = KL.Activation('relu')(prev_layer)
@@ -805,6 +805,10 @@ class PSP_EDGE_DEPTH(object):
         depth = KL.Conv2DTranspose(1, (3, 3), strides=2, padding="same", name="middle_depth")(depth_fusion)
 
         # semantic branch
+        res = KL.Conv2D(1536, (3, 3), padding="same", name="C5_conv_to_1536", use_bias=False)(res)
+        res = BN(name="C5_conv_to_1536_bn")
+        res = KL.Activation("relu")(res)
+
         res = KL.Concatenate(axis=3)([res, depth_feature])
         res = BN(name="before_psp_bn")(res)
         res = KL.Activation("relu")(res)
