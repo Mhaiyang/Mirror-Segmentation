@@ -278,7 +278,11 @@ mean_MSE             1842.60
 # segnet
 lr=0.01
 
-11.7
+mean_IOU             71.88 
+
+mean_ACC             89.93 
+
+mean_BER             12.62
 
 # psp_edge_depth_v10
 在v9的基础上，比例1:10:0.1，融合换成了pooling之后再融合。edge分支稍微变复杂了。
