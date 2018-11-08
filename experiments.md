@@ -290,7 +290,7 @@ mean_BER             12.62
 11.7
 
 # psp_edge_depth_v11
-在v10的基础上，将depth融合放到psp module之前。
+在v10的基础上，为了显存，edge分支简化了，和v9一样，将depth融合放到psp module之前。
 
 1:1:1
 
