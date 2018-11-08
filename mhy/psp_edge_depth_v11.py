@@ -806,7 +806,7 @@ class PSP_EDGE_DEPTH(object):
 
         # semantic branch
         res = KL.Conv2D(1536, (3, 3), padding="same", name="C5_conv_to_1536", use_bias=False)(res)
-        res = BN(name="C5_conv_to_1536_bn")
+        res = BN(name="C5_conv_to_1536_bn")(res)
         res = KL.Activation("relu")(res)
 
         res = KL.Concatenate(axis=3)([res, depth_feature])
