@@ -822,32 +822,25 @@ class PSP_EDGE_DEPTH(object):
         x = KL.Activation('relu')(x)
 
         # edge branch. 1/4 of input image
-        edge_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="edge_c1", use_bias=False)(C1)
-        edge_c1 = BN(name="edge_c1_bn")(edge_c1)
-        edge_c1 = KL.Activation("relu")(edge_c1)
+        edge_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", activation="relu", name="edge_c1")(C1)
+        edge_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", activation="relu", name="edge_c2")(C2)
+        edge_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", activation="relu", name="edge_c3")(C3)
+        edge_fusion = KL.Concatenate(axis=3, name="edge_fusion")([edge_c1, edge_c2, edge_c3])
+        edge_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                               activation="relu", name="edge_conv1")(edge_fusion)
+        edge_conv2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                               activation="relu", name="edge_conv2")(edge_conv1)
+        edge_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same",
+                               name="edge_conv3", use_bias=False)(edge_conv2)
+        edge_conv3 = BN(name="edge_bn")(edge_conv3)
+        edge_conv3 = KL.Activation("relu")(edge_conv3)
 
-        edge_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_c2", use_bias=False)(C2)
-        edge_c2 = BN(name="edge_c2_bn")(edge_c2)
-        edge_c2 = KL.Activation("relu")(edge_c2)
-
-        edge_c3 = KL.Conv2DTranspose(256, (3, 3), strides=(2, 2), padding="same", name="edge_c3", use_bias=False)(C3)
-        edge_c3 = BN(name="edge_c3_bn")(edge_c3)
-        edge_c3 = KL.Activation("relu")(edge_c3)
-
-        edge_c123 = KL.Concatenate(axis=3)([edge_c1, edge_c2, edge_c3])
-        edge_c123 = KL.Conv2D(256, (3, 3), padding="same", name="edge_c123_conv1", use_bias=False)(edge_c123)
-        edge_c123 = BN(name="edge_c123_conv1_bn")(edge_c123)
-        edge_c123 = KL.Activation("relu")(edge_c123)
-        edge_c123 = KL.Conv2D(256, (3, 3), padding="same", name="edge_c123_conv2", use_bias=False)(edge_c123)
-        edge_c123 = BN(name="edge_c123_conv2_bn")(edge_c123)
-        edge_c123 = KL.Activation("relu")(edge_c123)
-
-        edge_feature = KL.AveragePooling2D(pool_size=(2, 2))(edge_c123)
-        edge_feature = KL.Conv2D(256, (3, 3), padding="same", name="edge_feature", use_bias=False)(edge_feature)
-        edge_feature = BN(name="edge_deature_bn")(edge_feature)
+        edge_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same",
+                                 name="edge_feature", use_bias=False)(edge_conv3)
+        edge_feature = BN(name="edge_feature_bn")(edge_feature)
         edge_feature = KL.Activation("relu")(edge_feature)
 
-        edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(edge_c123)
+        edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(edge_conv3)
         edge = Interp([640, 640])(edge)
         edge = KL.Activation("sigmoid")(edge)
 
