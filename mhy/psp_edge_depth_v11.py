@@ -833,7 +833,7 @@ class PSP_EDGE_DEPTH(object):
         edge_c3 = KL.Activation("relu")(edge_c3)
 
         edge_c123 = KL.Concatenate(axis=3)([edge_c1, edge_c2, edge_c3])
-        edge_c123 = KL.Conv2D(128, (3, 3), padding="same", name="edge_c123_conv1", use_bias=False)(edge_c123)
+        edge_c123 = KL.Conv2D(64, (3, 3), padding="same", name="edge_c123_conv1", use_bias=False)(edge_c123)
         edge_c123 = BN(name="edge_c123_conv1_bn")(edge_c123)
         edge_c123 = KL.Activation("relu")(edge_c123)
         edge_c123 = KL.Conv2D(64, (3, 3), padding="same", name="edge_c123_conv2", use_bias=False)(edge_c123)
