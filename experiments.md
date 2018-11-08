@@ -267,7 +267,13 @@ mean_BER             21.24
 # psp_edge_depth_v9
 算是在v7的基础上， edge分支不变， depth分支采用了arxiv18的，学习率0.01，比例1:1:1。depth是0-1之间的，L1损失函数。
 
-11.7
+mean_IOU             71.34 
+
+mean_ACC             89.67 
+
+mean_BER             13.33 
+
+mean_MSE             1842.60
 
 # segnet
 lr=0.01
