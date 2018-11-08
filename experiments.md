@@ -287,7 +287,9 @@ lr=0.01
 
 # psp_edge_depth_v11
 在v10的基础上，将depth融合放到psp module之前。
+
 1:1:1
+
 11.7
 
 
