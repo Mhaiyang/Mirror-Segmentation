@@ -287,18 +287,18 @@ mean_BER             12.62
 # psp_edge_depth_v10
 在v9的基础上，比例1:10:0.1，融合换成了pooling之后再融合。edge分支稍微变复杂了。
 
-11.7
+11.8
 
 # psp_edge_depth_v11
 在v10的基础上，为了显存，edge分支简化了，和v9一样，将depth融合放到psp module之前。
 
 1:1:1
 
-11.7
+11.8
 
 # cinet ECCV2018
 
-11.7
+11.8
 
 
 
