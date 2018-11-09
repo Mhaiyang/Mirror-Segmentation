@@ -13,7 +13,7 @@ import mirror
 import mhy.psp_edge_depth_v11 as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2, 3, 4, 5"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4, 5"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "6, 7, 8, 9"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
