@@ -304,6 +304,10 @@ mean_ACC             88.75
 
 mean_BER             14.69
 
+# psp_edge_depth_v12
+在v4的基础上，将edge和depth都叠加在了psp module之前。
+11.9
+
 # cinet ECCV2018
 
 mean_IOU             70.42
