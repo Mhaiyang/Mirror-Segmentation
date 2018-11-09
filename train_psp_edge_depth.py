@@ -13,7 +13,7 @@ import mirror
 import mhy.psp_edge_depth_v11 as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "4, 5"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2, 3, 4, 5"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "6, 7, 8, 9"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -65,12 +65,12 @@ if init_with == "last":
 # ## Training
 
 # 1. Train the head branches 1e-3
-model.train(dataset_train, dataset_val,
-            learning_rate=config.LEARNING_RATE,
-            epochs=30,
-            layers='all')
-model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v11_all_30.h5")
-model.keras_model.save_weights(model_path)
+# model.train(dataset_train, dataset_val,
+#             learning_rate=config.LEARNING_RATE,
+#             epochs=30,
+#             layers='all')
+# model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v11_all_30.h5")
+# model.keras_model.save_weights(model_path)
 
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
