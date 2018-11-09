@@ -56,7 +56,7 @@ dataset_val.prepare("validation")
 model = modellib.PSP_EDGE_DEPTH(mode="training", config=config, model_dir=MODEL_DIR)
 
 # Which weights to start with?
-init_with = "resnet101"  # resnet or last
+init_with = "last"  # resnet or last
 
 if init_with == "last":
     # Load the last model you trained and continue training
