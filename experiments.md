@@ -298,7 +298,11 @@ mean_BER             12.62
 
 # cinet ECCV2018
 
-11.8
+mean_IOU             70.42
+ 
+mean_ACC             89.34 
+
+mean_BER             12.94
 
 
 

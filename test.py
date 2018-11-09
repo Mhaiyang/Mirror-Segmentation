@@ -13,15 +13,15 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.segnet as modellib
+import mhy.icnet as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "segnet")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_segnet_all_60.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "icnet")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_icnet_all_120.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test2", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test2", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test2', "segnet_60")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test2', "icnet_120")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -39,7 +39,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.SEGNET(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.ICNET(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 

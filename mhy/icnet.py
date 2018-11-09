@@ -721,6 +721,7 @@ class ICNET(object):
             model = KM.Model(inputs, outputs, name='ICNET')
 
         else:
+            out = KL.Lambda(lambda x: tf.image.resize_bilinear(tf.cast(x, tf.float32), 640 * tf.ones(2, dtype=tf.int32)))(out)
             model = KM.Model(input_image, out, name='ICNET')
 
         # Add multi-GPU support.
