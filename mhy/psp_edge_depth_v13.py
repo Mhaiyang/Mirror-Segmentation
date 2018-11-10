@@ -766,8 +766,8 @@ class PSP_EDGE_DEPTH(object):
         edge_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="edge_c1", use_bias=False)(C1)
         edge_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_c2", use_bias=False)(C2)
         edge_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", name="edge_c3", use_bias=False)(C3)
-        edge_fusion = KL.Concatenate(axis=3, name="edge_fusion")([edge_c1, edge_c2, edge_c3])
-        edge_fusion = BN(name="edge_fusion_bn")(edge_fusion)
+        edge_fusion = KL.Concatenate(axis=3)([edge_c1, edge_c2, edge_c3])
+        edge_fusion = BN(name="edge_c123_bn")(edge_fusion)
         edge_fusion = KL.Activation("relu")(edge_fusion)
 
         edge_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_conv1", use_bias=False)(edge_fusion)
@@ -1051,7 +1051,7 @@ class PSP_EDGE_DEPTH(object):
             "*epoch*", "{epoch:04d}")
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
-              augmentation=None, save_model_each_epoch=False):
+              save_model_each_epoch=False, augmentation=None):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with

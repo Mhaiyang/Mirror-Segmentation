@@ -63,35 +63,20 @@ if init_with == "last":
     model.load_weights(model.find_last()[1], by_name=True)
 
 # ## Training
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE,
+            epochs=25,
+            layers='all',
+            save_model_each_epoch=False)
+model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v13_all_25.h5")
+model.keras_model.save_weights(model_path)
 
-# 1. Train the head branches 1e-3
-# model.train(dataset_train, dataset_val,
-#             learning_rate=config.LEARNING_RATE,
-#             epochs=30,
-#             layers='all')
-# model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v11_all_30.h5")
-# model.keras_model.save_weights(model_path)
-
+# save model weights.
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=40,
-            layers='all')
+            layers='all',
+            save_model_each_epoch=True)
 model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v13_all_40.h5")
 model.keras_model.save_weights(model_path)
-
-# 2. Fine tune all layers 1e-3
-# model.train(dataset_train, dataset_val,
-#             learning_rate=config.LEARNING_RATE / 10,
-#             epochs=60,
-#             layers="all", save_model_each_epoch=False)
-# model_path = os.path.join(MODEL_DIR, "mirror_psp_all_60.h5")
-# model.keras_model.save_weights(model_path)
-
-# 3. Fine tune all layers with smaller lr 2*1e-4
-# model.train(dataset_train, dataset_val,
-#             learning_rate=config.LEARNING_RATE / 50,
-#             epochs=80,
-#             layers="all", save_model_each_epoch=False)
-# model_path = os.path.join(MODEL_DIR, "mirror_psp_all_80.h5")
-# model.keras_model.save_weights(model_path)
 
