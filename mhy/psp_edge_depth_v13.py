@@ -800,7 +800,7 @@ class PSP_EDGE_DEPTH(object):
         depth_fusion = KL.Activation("relu")(depth_fusion)
 
         depth_c4 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", name="depth_c4", use_bias=False)(C4)
-        depth_c4 = BN(name="depth_c4")(depth_c4)
+        depth_c4 = BN(name="depth_c4_bn")(depth_c4)
         depth_c4 = KL.Activation("relu")(depth_c4)
 
         depth_conv1 = KL.Concatenate(axis=3)([depth_fusion, depth_c4])
