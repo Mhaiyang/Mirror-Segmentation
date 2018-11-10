@@ -313,6 +313,13 @@ mean_ACC             91.45
 
 mean_BER             11.09
 
+# psp_edge_depth_v13
+depth分支采用arxiv，edge分支只有三层，都叠加在psp之前，比例1:0.5:0.5.
+11.10
+
+
+
+
 # cinet ECCV2018
 
 mean_IOU             70.42
@@ -320,9 +327,6 @@ mean_IOU             70.42
 mean_ACC             89.34 
 
 mean_BER             12.94
-
-
-
 
 # mask rcnn
 mean_IOU             78.01  79.81

@@ -35,9 +35,9 @@ class MirrorConfig(Config):
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
     LOSS_WEIGHTS = {
-        "mask_loss": 1.,
-        "edge_loss": 0.1,
-        "depth_loss": 0.1,
+        "mask_loss": 1.0,
+        "edge_loss": 0.5,
+        "depth_loss": 0.5,
     }
 
     # Use a small epoch since the data is simple
