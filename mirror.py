@@ -36,8 +36,8 @@ class MirrorConfig(Config):
 
     LOSS_WEIGHTS = {
         "mask_loss": 1.0,
-        "edge_loss": 0.5,
-        "depth_loss": 0.5,
+        "edge_loss": 1.0,
+        "depth_loss": 1.0,
     }
 
     # Use a small epoch since the data is simple
