@@ -13,15 +13,15 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.icnet as modellib
+import mhy.psp_edge_depth_v13 as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "icnet")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_icnet_all_150.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v13")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_0040.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "icnet")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "psp_edge_depth_v13_0040")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -39,7 +39,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.ICNET(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.PSP_EDGE_DEPTH(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 
@@ -80,15 +80,15 @@ for i, imgname in enumerate(imglist):
     elif height < width:
         predict_mask = predict_mask_square[64:576, :]
 
-    # # if have edge branch
-    # if height > width:
-    #     predict_edge = r["edge"][0, :, :, 0][:, 64:576]
-    #     predict_depth = r["depth"][0, :, :, 0][:, 64:576]
-    # elif height < width:
-    #     predict_edge = r["edge"][0, :, :, 0][64:576, :]
-    #     predict_depth = r["depth"][0, :, :, 0][64:576, :]
-    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
-    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth.astype(np.uint8))
+    # if have edge branch
+    if height > width:
+        predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+        predict_depth = r["depth"][0, :, :, 0][:, 64:576]
+    elif height < width:
+        predict_edge = r["edge"][0, :, :, 0][64:576, :]
+        predict_depth = r["depth"][0, :, :, 0][64:576, :]
+    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
+    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth.astype(np.uint8))
 
     iou = evaluation.iou(predict_mask, gt_mask)
     acc = evaluation.accuracy(predict_mask, gt_mask)
