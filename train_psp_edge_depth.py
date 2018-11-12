@@ -68,7 +68,7 @@ model.train(dataset_train, dataset_val,
             epochs=45,
             layers='all',
             save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_all_45.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v15_all_45.h5")
 model.keras_model.save_weights(model_path)
 
 # save model weights.
@@ -77,6 +77,6 @@ model.train(dataset_train, dataset_val,
             epochs=55,
             layers='all',
             save_model_each_epoch=True)
-model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_all_55.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v15_all_55.h5")
 model.keras_model.save_weights(model_path)
 
