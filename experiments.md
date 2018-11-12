@@ -317,6 +317,11 @@ mean_BER             11.09
 depth分支采用arxiv，edge分支只有三层，都叠加在psp之前，比例1:0.5:0.5.
 11.10
 
+# psp_edge_depth_v14
+mean_IOU             83.43 
+mean_ACC             94.25 
+mean_BER             6.85
+
 
 
 
