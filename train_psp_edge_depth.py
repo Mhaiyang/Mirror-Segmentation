@@ -10,7 +10,7 @@
 """
 import os
 import mirror
-import mhy.psp_edge_depth_v14_psp_depth as modellib
+import mhy.psp_edge_depth_v14_psp_edge as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "4, 5"
@@ -21,7 +21,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "4, 5, 6, 7"
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v14_psp_depth")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v14_psp_edge")
     
 config = mirror.MirrorConfig()
 config.display()
@@ -68,7 +68,7 @@ model.train(dataset_train, dataset_val,
             epochs=35,
             layers='all',
             save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_psp_depth_all_35.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_psp_edge_all_35.h5")
 model.keras_model.save_weights(model_path)
 
 # save model weights.
@@ -77,6 +77,6 @@ model.train(dataset_train, dataset_val,
             epochs=45,
             layers='all',
             save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_psp_depth_all_45.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_psp_edge_all_45.h5")
 model.keras_model.save_weights(model_path)
 

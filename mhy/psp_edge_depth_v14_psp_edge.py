@@ -5,7 +5,7 @@
 
   @Project : mirror
   @File    : psp.py
-  @Function: psp + edge + depth
+  @Function: psp + edge
 
 """
 
@@ -768,89 +768,88 @@ class PSP_EDGE_DEPTH(object):
         x = KL.Activation('relu')(x)
 
         # edge branch. 1/4 of input image
-        # edge_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="edge_c1", use_bias=False)(C1)
-        # edge_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_c2", use_bias=False)(C2)
-        # edge_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", name="edge_c3", use_bias=False)(C3)
-        # edge_fusion = KL.Concatenate(axis=3, name="edge_fusion")([edge_c1, edge_c2, edge_c3])
-        # edge_fusion = BN(name="edge_fusion_bn")(edge_fusion)
-        # edge_fusion = KL.Activation("relu")(edge_fusion)
-        #
-        # edge_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_conv1", use_bias=False)(edge_fusion)
-        # edge_conv1 = BN(name="edge_conv1_bn")(edge_conv1)
-        # edge_conv1 = KL.Activation("relu")(edge_conv1)
-        # edge_conv2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_conv2", use_bias=False)(edge_conv1)
-        # edge_conv2 = BN(name="edge_conv2_bn")(edge_conv2)
-        # edge_conv2 = KL.Activation("relu")(edge_conv2)
-        # edge_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_conv3", use_bias=False)(edge_conv2)
-        # edge_conv3 = BN(name="edge_conv3_bn")(edge_conv3)
-        # edge_conv3 = KL.Activation("relu")(edge_conv3)
-        #
-        # edge_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="edge_feature", use_bias=False)(edge_conv3)
-        # edge_feature = BN(name="edge_feature_bn")(edge_feature)
-        # edge_feature = KL.Activation("relu")(edge_feature)
-        #
-        # edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(edge_conv3)
-        # edge = Interp([640, 640])(edge)
-        # edge = KL.Activation("sigmoid")(edge)
+        edge_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="edge_c1", use_bias=False)(C1)
+        edge_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_c2", use_bias=False)(C2)
+        edge_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", name="edge_c3", use_bias=False)(C3)
+        edge_fusion = KL.Concatenate(axis=3, name="edge_fusion")([edge_c1, edge_c2, edge_c3])
+        edge_fusion = BN(name="edge_fusion_bn")(edge_fusion)
+        edge_fusion = KL.Activation("relu")(edge_fusion)
+
+        edge_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_conv1", use_bias=False)(edge_fusion)
+        edge_conv1 = BN(name="edge_conv1_bn")(edge_conv1)
+        edge_conv1 = KL.Activation("relu")(edge_conv1)
+        edge_conv2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_conv2", use_bias=False)(edge_conv1)
+        edge_conv2 = BN(name="edge_conv2_bn")(edge_conv2)
+        edge_conv2 = KL.Activation("relu")(edge_conv2)
+        edge_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="edge_conv3", use_bias=False)(edge_conv2)
+        edge_conv3 = BN(name="edge_conv3_bn")(edge_conv3)
+        edge_conv3 = KL.Activation("relu")(edge_conv3)
+
+        edge_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="edge_feature", use_bias=False)(edge_conv3)
+        edge_feature = BN(name="edge_feature_bn")(edge_feature)
+        edge_feature = KL.Activation("relu")(edge_feature)
+
+        edge = KL.Conv2D(1, (3, 3), strides=(1, 1), padding="same", name="middle_edge")(edge_conv3)
+        edge = Interp([640, 640])(edge)
+        edge = KL.Activation("sigmoid")(edge)
 
         # depth branch. 1/2 of input image
-        depth_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="depth_c1", use_bias=False)(C1)
-        depth_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_c2", use_bias=False)(C2)
-        depth_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", name="depth_c3", use_bias=False)(C3)
-        depth_fusion = KL.Concatenate(axis=3, name="depth_fusion")([depth_c1, depth_c2, depth_c3])
-        depth_fusion = BN(name="depth_fusion_bn")(depth_fusion)
-        depth_fusion = KL.Activation("relu")(depth_fusion)
-        depth_fusion = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_fusion_conv", use_bias=False)(depth_fusion)
-        depth_fusion = BN(name="depth_fusion_conv_bn")(depth_fusion)
-        depth_fusion = KL.Activation("relu")(depth_fusion)
-
-        # depth residual.
-        depth_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv1", use_bias=False)(depth_fusion)
-        depth_conv1 = BN(name="depth_conv1_bn")(depth_conv1)
-        depth_conv1 = KL.Activation("relu")(depth_conv1)
-        depth_conv2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv2", use_bias=False)(depth_conv1)
-        depth_conv2 = BN(name="depth_conv2_bn")(depth_conv2)
-        depth_conv2 = KL.Activation("relu")(depth_conv2)
-        depth_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv3", use_bias=False)(depth_conv2)
-        depth_conv3 = BN(name="depth_conv3_bn")(depth_conv3)
-        depth_conv3 = KL.Activation("relu")(depth_conv3)
-        depth_conv4 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv4", use_bias=False)(depth_conv3)
-        depth_conv4 = BN(name="depth_conv4_bn")(depth_conv4)
-        depth_conv4 = KL.Activation("relu")(depth_conv4)
-        depth_conv5 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv5", use_bias=False)(depth_conv4)
-        depth_conv5 = BN(name="depth_conv5_bn")(depth_conv5)
-        depth_conv5 = KL.Activation("relu")(depth_conv5)
-
-        depth_fusion = KL.Add(name="depth_add")([depth_fusion, depth_conv5])
-
-        depth_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="depth_feature", use_bias=False)(depth_fusion)
-        depth_feature = BN(name="depth_feature_bn")(depth_feature)
-        depth_feature = KL.Activation("relu")(depth_feature)
-
-        depth = KL.Conv2DTranspose(128, (4, 4), strides=2, padding="same", activation="relu", name="middle_depth1")(depth_fusion)
-        depth = KL.Conv2DTranspose(1, (4, 4), strides=2, padding="same", name="middle_depth2")(depth)
+        # depth_c1 = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="depth_c1", use_bias=False)(C1)
+        # depth_c2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_c2", use_bias=False)(C2)
+        # depth_c3 = KL.Conv2DTranspose(256, (4, 4), strides=(2, 2), padding="same", name="depth_c3", use_bias=False)(C3)
+        # depth_fusion = KL.Concatenate(axis=3, name="depth_fusion")([depth_c1, depth_c2, depth_c3])
+        # depth_fusion = BN(name="depth_fusion_bn")(depth_fusion)
+        # depth_fusion = KL.Activation("relu")(depth_fusion)
+        # depth_fusion = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_fusion_conv", use_bias=False)(depth_fusion)
+        # depth_fusion = BN(name="depth_fusion_conv_bn")(depth_fusion)
+        # depth_fusion = KL.Activation("relu")(depth_fusion)
+        #
+        # # depth residual.
+        # depth_conv1 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv1", use_bias=False)(depth_fusion)
+        # depth_conv1 = BN(name="depth_conv1_bn")(depth_conv1)
+        # depth_conv1 = KL.Activation("relu")(depth_conv1)
+        # depth_conv2 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv2", use_bias=False)(depth_conv1)
+        # depth_conv2 = BN(name="depth_conv2_bn")(depth_conv2)
+        # depth_conv2 = KL.Activation("relu")(depth_conv2)
+        # depth_conv3 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv3", use_bias=False)(depth_conv2)
+        # depth_conv3 = BN(name="depth_conv3_bn")(depth_conv3)
+        # depth_conv3 = KL.Activation("relu")(depth_conv3)
+        # depth_conv4 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv4", use_bias=False)(depth_conv3)
+        # depth_conv4 = BN(name="depth_conv4_bn")(depth_conv4)
+        # depth_conv4 = KL.Activation("relu")(depth_conv4)
+        # depth_conv5 = KL.Conv2D(256, (3, 3), strides=(1, 1), padding="same", name="depth_conv5", use_bias=False)(depth_conv4)
+        # depth_conv5 = BN(name="depth_conv5_bn")(depth_conv5)
+        # depth_conv5 = KL.Activation("relu")(depth_conv5)
+        #
+        # depth_fusion = KL.Add(name="depth_add")([depth_fusion, depth_conv5])
+        #
+        # depth_feature = KL.Conv2D(256, (3, 3), strides=(2, 2), padding="same", name="depth_feature", use_bias=False)(depth_fusion)
+        # depth_feature = BN(name="depth_feature_bn")(depth_feature)
+        # depth_feature = KL.Activation("relu")(depth_feature)
+        #
+        # depth = KL.Conv2DTranspose(128, (4, 4), strides=2, padding="same", activation="relu", name="middle_depth1")(depth_fusion)
+        # depth = KL.Conv2DTranspose(1, (4, 4), strides=2, padding="same", name="middle_depth2")(depth)
 
         # final prediction.
-        final = KL.Concatenate(axis=3, name="final_fusion")([x, depth_feature])
+        final = KL.Concatenate(axis=3, name="final_fusion")([x, edge_feature])
         final = KL.Conv2D(1, (5, 5), name="final_conv")(final)
         final = Interp([640, 640])(final)
         predict_mask = KL.Activation('sigmoid')(final)
 
         if mode == "training":
             # middle loss
-            # edge_loss = KL.Lambda(lambda x: edge_loss_graph(*x), name="edge_loss")([input_gt_edge, edge])
-            depth_loss = KL.Lambda(lambda x: depth_loss_graph(*x), name="depth_loss")([input_gt_depth, depth])
+            edge_loss = KL.Lambda(lambda x: edge_loss_graph(*x), name="edge_loss")([input_gt_edge, edge])
             # final loss
             mask_loss = KL.Lambda(lambda x: mask_loss_graph(*x), name="mask_loss")([input_gt_mask, predict_mask])
 
             # Model
             inputs = [input_image, input_gt_mask, input_gt_edge, input_gt_depth]
-            outputs = [predict_mask, depth_loss, mask_loss]
+            outputs = [predict_mask, edge_loss, mask_loss]
             model = KM.Model(inputs, outputs, name='PSP_EDGE_DEPTH')
             model.load_weights(self.config.Pretrained_Model_Path, by_name=True)
 
         else:
-            model = KM.Model(input_image, [predict_mask, depth], name='PSP_EDGE_DEPTH')
+            model = KM.Model(input_image, [predict_mask, edge], name='PSP_EDGE_DEPTH')
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
@@ -948,7 +947,7 @@ class PSP_EDGE_DEPTH(object):
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
         self.keras_model._per_input_losses = {}
-        loss_names = ["mask_loss", "depth_loss"]
+        loss_names = ["mask_loss", "edge_loss"]
         for name in loss_names:
             layer = self.keras_model.get_layer(name)
             if layer.output in self.keras_model.losses:
@@ -1244,13 +1243,14 @@ class PSP_EDGE_DEPTH(object):
         if verbose:
             log("molded_images", molded_images)
         # Run object detection
-        predict_mask, depth = self.keras_model.predict([molded_images], verbose=0)
+        predict_mask, edge, depth = self.keras_model.predict([molded_images], verbose=0)
 
         # Process detections
         results = []
         final_mask = self.unmold_detections(predict_mask)
+        final_edge = utils.unmold_edge(edge)
         final_depth = utils.unmold_depth(depth)
-        results.append({"mask": final_mask, "depth": final_depth})
+        results.append({"mask": final_mask, "edge": final_edge, "depth": final_depth})
 
         return results
 

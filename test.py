@@ -13,16 +13,16 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.psp_edge_depth_v14 as modellib
+import mhy.psp_edge_depth_v14_psp_depth as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v14")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_all_50.h5")
-# MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror20181112T0745/mirror_0055.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v14_psp_depth")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_psp_depth_all_45.h5")
+# MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror20181111T1153/mirror_0045.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "psp_edge_depth_v14_0050")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "psp_edge_depth_v14_psp_depth_0045")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -83,12 +83,12 @@ for i, imgname in enumerate(imglist):
 
     # if have edge branch
     if height > width:
-        predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+        # predict_edge = r["edge"][0, :, :, 0][:, 64:576]
         predict_depth = r["depth"][0, :, :, 0][:, 64:576]
     elif height < width:
-        predict_edge = r["edge"][0, :, :, 0][64:576, :]
+        # predict_edge = r["edge"][0, :, :, 0][64:576, :]
         predict_depth = r["depth"][0, :, :, 0][64:576, :]
-    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
+    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
     skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth.astype(np.uint8))
 
     iou = evaluation.iou(predict_mask, gt_mask)

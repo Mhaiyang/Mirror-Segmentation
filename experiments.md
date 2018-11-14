@@ -322,6 +322,11 @@ mean_IOU             83.43
 mean_ACC             94.25 
 mean_BER             6.85
 
+# psp_edge_depth_v14_psp_depth
+mean_IOU             80.46 
+mean_ACC             93.09 
+mean_BER             8.32
+
 
 
 
