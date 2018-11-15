@@ -319,12 +319,14 @@ depth分支采用arxiv，edge分支只有三层，都叠加在psp之前，比例
 
 # psp_edge_depth_v14
 mean_IOU             83.43 
-mean_ACC             94.25 
+mean_ACC_all         94.25 
+mean_ACC_mirror      89.27 
 mean_BER             6.85
 
 # psp_edge_depth_v14_psp_depth
 mean_IOU             80.46 
-mean_ACC             93.09 
+mean_ACC_all         93.09 
+mean_ACC_mirror      85.69 
 mean_BER             8.32
 
 # psp_edge_depth_v14_psp_edge
