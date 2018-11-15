@@ -27,6 +27,11 @@ mean_ACC             87.59
 
 mean_BER             13.60
 
+mean_IOU             71.64 
+mean_ACC_all         89.84 
+mean_ACC_mirror      84.42 
+mean_BER             11.13
+
 # psp
 pspnet101_voc2012.h5 batch 4*1 40epoch
 
@@ -47,6 +52,11 @@ mean_IOU             68.96
 mean_ACC             88.49 
 
 mean_BER             14.76
+
+mean_IOU             76.66 
+mean_ACC_all         91.71 
+mean_ACC_mirror      79.52 
+mean_BER             10.80
 
 第三次训练：psp_v4
 
@@ -264,6 +274,11 @@ mean_BER             21.24
 86.12
 17.81
 
+mean_IOU             63.63 
+mean_ACC_all         87.33 
+mean_ACC_mirror      72.08 
+mean_BER             16.55
+
 # psp_edge_depth_v9
 算是在v7的基础上， edge分支不变， depth分支采用了arxiv18的，学习率0.01，比例1:1:1。depth是0-1之间的，L1损失函数。
 
@@ -283,6 +298,11 @@ mean_IOU             71.88
 mean_ACC             89.93 
 
 mean_BER             12.62
+
+mean_IOU             74.15 
+mean_ACC_all         91.10 
+mean_ACC_mirror      81.00 
+mean_BER             11.35
 
 # psp_edge_depth_v10
 在v9的基础上，比例1:10:0.1，融合换成了pooling之后再融合。edge分支稍微变复杂了。
@@ -338,13 +358,19 @@ mean_BER             8.79
 
 
 
-# cinet ECCV2018
+# ICNet ECCV2018
 
 mean_IOU             70.42
  
 mean_ACC             89.34 
 
 mean_BER             12.94
+
+120 epoch
+mean_IOU             72.68 
+mean_ACC_all         90.52 
+mean_ACC_mirror      81.96 
+mean_BER             11.62
 
 # mask rcnn
 mean_IOU             78.01  79.81

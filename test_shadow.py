@@ -9,11 +9,8 @@ import numpy as np
 import skimage.io
 import skimage.measure
 import time
-import mhy.visualize as visualize
 import evaluation
-from mirror import MirrorConfig
-# Important, need change when test different models.
-import mhy.psp_edge_depth_v14_psp_depth as modellib
+
 
 # Directories of the project
 ROOT_DIR = os.getcwd()

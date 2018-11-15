@@ -13,12 +13,12 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.psp_edge_depth_v14 as modellib
+import mhy.icnet as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v14")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_all_45.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "icnet")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_icnet_all_150.h5")
 # MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror20181111T1153/mirror_0045.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "mask")
@@ -41,7 +41,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.PSP_EDGE_DEPTH(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.ICNET(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 
