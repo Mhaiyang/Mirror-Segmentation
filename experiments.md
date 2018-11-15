@@ -384,3 +384,8 @@ mean_IOU             78.01  79.81
 mean_ACC             88.17  92.55
 
 mean_BER             7.96  9.46
+
+mean_IOU             81.53 
+mean_ACC_all         93.50 
+mean_ACC_mirror      86.48 
+mean_BER             8.50
