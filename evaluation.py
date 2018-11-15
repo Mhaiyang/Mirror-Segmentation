@@ -15,6 +15,7 @@ t_i : total number of pixels of class i in ground truth segmentation
 import numpy as np
 import os
 from PIL import Image
+import skimage.io
 import skimage.transform
 
 
@@ -38,6 +39,18 @@ def get_mask(imgname, MASK_DIR):
                 if at_pixel == index + 1:
                     gt_mask[j, i] = 1
     return gt_mask
+
+
+def get_predict_mask(imgname, PREDICT_MASK_DIR):
+    """Get mask by specified single image name"""
+    filestr = imgname.split(".")[0]
+    mask_folder = PREDICT_MASK_DIR
+    mask_path = mask_folder + "/" + filestr + "mask.png"
+    if not os.path.exists(mask_path):
+        print("{} has no label8.png")
+    mask = skimage.io.imread(mask_path)
+
+    return mask.astype(np.uint8)
 
 
 def resize_mask(gt_mask, size):
@@ -71,7 +84,7 @@ def iou(predict_mask, gt_mask):
     return iou_
 
 
-def accuracy(predict_mask, gt_mask):
+def accuracy_all(predict_mask, gt_mask):
     """
     sum_i(n_ii) / sum_i(t_i)
     :param predict_mask:
@@ -90,6 +103,29 @@ def accuracy(predict_mask, gt_mask):
     TN = np.sum(np.logical_and(np.logical_not(predict_mask), np.logical_not(gt_mask)))
 
     accuracy_ = (TP + TN) / (N_p + N_n)
+
+    return accuracy_
+
+
+def accuracy_mirror(predict_mask, gt_mask):
+    """
+    sum_i(n_ii) / sum_i(t_i)
+    :param predict_mask:
+    :param gt_mask:
+    :return:
+    """
+
+    check_size(predict_mask, gt_mask)
+
+    N_p = np.sum(gt_mask)
+    N_n = np.sum(np.logical_not(gt_mask))
+    if N_p + N_n != 640 * 512:
+        raise Exception("Check if mask shape is correct!")
+
+    TP = np.sum(np.logical_and(predict_mask, gt_mask))
+    TN = np.sum(np.logical_and(np.logical_not(predict_mask), np.logical_not(gt_mask)))
+
+    accuracy_ = TP/N_p
 
     return accuracy_
 

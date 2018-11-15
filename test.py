@@ -13,16 +13,16 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.psp_edge_depth_v14_psp_depth as modellib
+import mhy.psp_edge_depth_v14_psp_edge as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v14_psp_depth")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_psp_depth_all_45.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_edge_depth_v14_psp_edge")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_edge_depth_v14_psp_edge_all_45.h5")
 # MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror20181111T1153/mirror_0045.h5")
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "psp_edge_depth_v14_psp_depth_0045")
+OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "psp_edge_depth_v14_psp_edge_0045")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -49,7 +49,8 @@ imglist = os.listdir(IMAGE_DIR)
 print("Total {} test images".format(len(imglist)))
 
 IOU = []
-ACC = []
+ACC_all = []
+ACC_mirror = []
 BER = []
 MSE = []
 
@@ -83,25 +84,28 @@ for i, imgname in enumerate(imglist):
 
     # if have edge branch
     if height > width:
-        # predict_edge = r["edge"][0, :, :, 0][:, 64:576]
-        predict_depth = r["depth"][0, :, :, 0][:, 64:576]
+        predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+        # predict_depth = r["depth"][0, :, :, 0][:, 64:576]
     elif height < width:
-        # predict_edge = r["edge"][0, :, :, 0][64:576, :]
-        predict_depth = r["depth"][0, :, :, 0][64:576, :]
-    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
-    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth.astype(np.uint8))
+        predict_edge = r["edge"][0, :, :, 0][64:576, :]
+        # predict_depth = r["depth"][0, :, :, 0][64:576, :]
+    skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
+    # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth.astype(np.uint8))
 
     iou = evaluation.iou(predict_mask, gt_mask)
-    acc = evaluation.accuracy(predict_mask, gt_mask)
+    acc_all = evaluation.accuracy_all(predict_mask, gt_mask)
+    acc_mirror = evaluation.accuracy_mirror(predict_mask, gt_mask)
     ber = evaluation.ber(predict_mask, gt_mask)
     # mse = skimage.measure.compare_mse(gt_depth, predict_depth)
 
     print("iou : {}".format(iou))
-    print("acc : {}".format(acc))
+    print("acc : {}".format(acc_all))
+    print("acc : {}".format(acc_mirror))
     print("ber : {}".format(ber))
     # print("mse : {}".format(mse))
     IOU.append(iou)
-    ACC.append(acc)
+    ACC_all.append(acc_all)
+    ACC_mirror.append(acc_mirror)
     BER.append(ber)
     # MSE.append(mse)
 
@@ -109,16 +113,18 @@ end = time.time()
 print("Time is : {}".format(end - start))
 
 mean_IOU = 100 * sum(IOU)/len(IOU)
-mean_ACC = 100 * sum(ACC)/len(ACC)
+mean_ACC_all = 100 * sum(ACC_all)/len(ACC_all)
+mean_ACC_mirror = 100 * sum(ACC_mirror)/len(ACC_mirror)
 mean_BER = 100 * sum(BER)/len(BER)
 # mean_MSE = sum(MSE)/len(MSE)
 
 print(len(IOU))
-print(len(ACC))
+print(len(ACC_all))
+print(len(ACC_mirror))
 print(len(BER))
 
-print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
-      format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER))
+print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f}".
+      format("mean_IOU", mean_IOU, "mean_ACC_all", mean_ACC_all, "mean_ACC_mirror", mean_ACC_mirror, "mean_BER", mean_BER))
 # # print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.4f}".
 # #       format("mean_IOU", mean_IOU, "mean_ACC", mean_ACC, "mean_BER", mean_BER,
 # #              "mean_PSNR", mean_PSNR, "mean_SSIM", mean_SSIM))
