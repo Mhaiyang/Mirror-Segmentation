@@ -372,6 +372,12 @@ mean_ACC_all         90.52
 mean_ACC_mirror      81.96 
 mean_BER             11.62
 
+150epoch
+mean_IOU             72.40 
+mean_ACC_all         90.40 
+mean_ACC_mirror      81.79 
+mean_BER             11.71
+
 # mask rcnn
 mean_IOU             78.01  79.81
 
