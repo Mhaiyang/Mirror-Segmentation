@@ -13,17 +13,18 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.icnet as modellib
+import mhy.unet as modellib
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "icnet")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_icnet_all_150.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "unet")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_unet_all_80.h5")
 # MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror20181111T1153/mirror_0045.h5")
-IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "image")
+# IMAGE_DIR = os.path.join("/home/iccd/Desktop/test/4")
+IMAGE_DIR = os.path.join("/home/iccd/Desktop/test/4")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "mask")
-# OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "psp_edge_depth_v14_psp_depth_0045")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "null")
+OUTPUT_PATH = os.path.join("/home/iccd/Desktop/test/Unet_outputNE")
+# OUTPUT_PATH = os.path.join("/home/iccd/Desktop/test/output_4")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -41,7 +42,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.ICNET(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.UNET(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 
@@ -84,12 +85,12 @@ for i, imgname in enumerate(imglist):
         predict_mask = predict_mask_square[64:576, :]
 
     # if have edge branch
-    # if height > width:
-    #     predict_edge = r["edge"][0, :, :, 0][:, 64:576]
-    #     # predict_depth = r["depth"][0, :, :, 0][:, 64:576]
-    # elif height < width:
-    #     predict_edge = r["edge"][0, :, :, 0][64:576, :]
-        # predict_depth = r["depth"][0, :, :, 0][64:576, :]
+    #if height > width:
+        #predict_edge = r["edge"][0, :, :, 0][:, 64:576]
+        #predict_depth = r["depth"][0, :, :, 0][:, 64:576]
+    #elif height < width:
+        #predict_edge = r["edge"][0, :, :, 0][64:576, :]
+        #predict_depth = r["depth"][0, :, :, 0][64:576, :]
     # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_edge.png"),  (255 * predict_edge).astype(np.uint8))
     # skimage.io.imsave(os.path.join(OUTPUT_PATH, imgname[:-4]+"_depth.png"), predict_depth.astype(np.uint8))
 

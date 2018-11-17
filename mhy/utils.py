@@ -462,6 +462,8 @@ def unmold_mask(predict_mask):
     """
     threshold = 0.5
     mask = np.where(predict_mask >= threshold, 1, 0).astype(np.uint8)
+    # for prob
+    # mask = (255*predict_mask).astype(np.uint8)
 
     # Final mask
     final_mask = mask
@@ -482,6 +484,9 @@ def unmold_semantic(semantic):
     # semantic = skimage.transform.resize(semantic, (640, 640), order=1, mode="constant")
     # semantic = np.expand_dims(semantic, 0)
     semantic = np.where(semantic >= threshold, 1, 0).astype(np.uint8)
+    # if want to output probability.
+    semantic = (255 * semantic).astype(np.uint8)
+
 
     # Final semantic
     final_semantic = semantic
@@ -518,10 +523,7 @@ def unmold_depth(depth):
     Returns a binary mask with the same size as the original image.
     """
     # for v4
-    # final_depth = depth.astype(np.uint8)
-
-    # for v5
-    final_depth = (depth * 255).astype(np.uint8)
+    final_depth = depth.astype(np.uint8)
 
     return final_depth
 
