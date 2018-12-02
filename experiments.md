@@ -390,7 +390,7 @@ mean_ACC_all         93.50
 mean_ACC_mirror      86.48 
 mean_BER             8.50
 
-# PiCANet
+# PiCANet(CVPR2018)
 mean_IOU             93.18
  
 mean_ACC_all         98.06 
