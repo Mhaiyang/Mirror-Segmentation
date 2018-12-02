@@ -45,12 +45,13 @@ def get_predict_mask(imgname, PREDICT_MASK_DIR):
     """Get mask by specified single image name"""
     filestr = imgname.split(".")[0]
     mask_folder = PREDICT_MASK_DIR
-    mask_path = mask_folder + "/" + filestr + "mask.png"
+    mask_path = mask_folder + "/" + filestr + ".png"
     if not os.path.exists(mask_path):
         print("{} has no label8.png")
     mask = skimage.io.imread(mask_path)
+    mask = np.where(mask > 127, 1, 0).astype(np.uint8)
 
-    return mask.astype(np.uint8)
+    return mask
 
 
 def resize_mask(gt_mask, size):

@@ -389,3 +389,12 @@ mean_IOU             81.53
 mean_ACC_all         93.50 
 mean_ACC_mirror      86.48 
 mean_BER             8.50
+
+# PiCANet
+mean_IOU             93.18
+ 
+mean_ACC_all         98.06 
+
+mean_ACC_mirror      96.50 
+
+mean_BER             2.49

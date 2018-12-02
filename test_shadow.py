@@ -16,10 +16,7 @@ import evaluation
 ROOT_DIR = os.getcwd()
 IMAGE_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "image")
 MASK_DIR = os.path.join(ROOT_DIR, "data_640", "test3", "mask")
-SHADOW_DIR = os.path.join(ROOT_DIR, "shadow")
-OUTPUT_PATH = os.path.join(ROOT_DIR, 'data_640', 'test3', "psp_edge_depth_v14_psp_depth_0045")
-if not os.path.exists(OUTPUT_PATH):
-    os.mkdir(OUTPUT_PATH)
+SHADOW_DIR = os.path.join(ROOT_DIR, "PiCANet")
 
 # ## Run Object Detection
 imglist = os.listdir(IMAGE_DIR)
