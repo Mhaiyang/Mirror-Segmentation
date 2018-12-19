@@ -17,7 +17,28 @@ import os
 from PIL import Image
 import skimage.io
 import skimage.transform
+import xlwt
 
+def data_write(file_path, datas):
+    f = xlwt.Workbook()
+    sheet1 = f.add_sheet(sheetname="sheet1", cell_overwrite_ok=True)
+
+    j = 0
+    for data in datas:
+        for i in range(len(data)):
+            sheet1.write(i, j, data[i])
+        j = j + 1
+
+    f.save(file_path)
+
+def get_mask_directly(imgname, MASK_DIR):
+    filestr = imgname.split(".")[0]
+    mask_folder = MASK_DIR
+    mask_path = mask_folder + "/" + filestr + ".png"
+    mask = skimage.io.imread(mask_path)
+    mask = np.where(mask == 255, 1, 0).astype(np.uint8)
+
+    return mask
 
 def get_mask(imgname, MASK_DIR):
     """Get mask by specified single image name"""
@@ -62,50 +83,30 @@ def resize_mask(gt_mask, size):
     return resized_gt_mask
 
 
-def iou(predict_mask, gt_mask):
-    """
-    (1/n_cl) * sum_i(n_ii / (t_i + sum_j(n_ji) - n_ii))
-    Here, n_cl = 1 as we have only one class (mirror).
-    :param predict_mask:
-    :param gt_mask:
-    :return:
-    """
-
-    check_size(predict_mask, gt_mask)
-
-    if np.sum(predict_mask) == 0 or np.sum(gt_mask) == 0:
-        IoU = 0
-
-    n_ii = np.sum(np.logical_and(predict_mask, gt_mask))
-    t_i = np.sum(gt_mask)
-    n_ij = np.sum(predict_mask)
-
-    iou_ = n_ii / (t_i + n_ij - n_ii)
-
-    return iou_
-
-
-def accuracy_all(predict_mask, gt_mask):
-    """
-    sum_i(n_ii) / sum_i(t_i)
-    :param predict_mask:
-    :param gt_mask:
-    :return:
-    """
-
-    check_size(predict_mask, gt_mask)
-
-    N_p = np.sum(gt_mask)
-    N_n = np.sum(np.logical_not(gt_mask))
-    if N_p + N_n != 640 * 512:
-        raise Exception("Check if mask shape is correct!")
-
-    TP = np.sum(np.logical_and(predict_mask, gt_mask))
-    TN = np.sum(np.logical_and(np.logical_not(predict_mask), np.logical_not(gt_mask)))
-
-    accuracy_ = (TP + TN) / (N_p + N_n)
-
-    return accuracy_
+#################################################################################################
+#################################################################################################
+#################################################################################################
+# def accuracy_all(predict_mask, gt_mask):
+#     """
+#     sum_i(n_ii) / sum_i(t_i)
+#     :param predict_mask:
+#     :param gt_mask:
+#     :return:
+#     """
+#
+#     check_size(predict_mask, gt_mask)
+#
+#     N_p = np.sum(gt_mask)
+#     N_n = np.sum(np.logical_not(gt_mask))
+#     if N_p + N_n != 640 * 512:
+#         raise Exception("Check if mask shape is correct!")
+#
+#     TP = np.sum(np.logical_and(predict_mask, gt_mask))
+#     TN = np.sum(np.logical_and(np.logical_not(predict_mask), np.logical_not(gt_mask)))
+#
+#     accuracy_ = (TP + TN) / (N_p + N_n)
+#
+#     return accuracy_
 
 
 def accuracy_mirror(predict_mask, gt_mask):
@@ -129,6 +130,69 @@ def accuracy_mirror(predict_mask, gt_mask):
     accuracy_ = TP/N_p
 
     return accuracy_
+
+
+def iou(predict_mask, gt_mask):
+    """
+    (1/n_cl) * sum_i(n_ii / (t_i + sum_j(n_ji) - n_ii))
+    Here, n_cl = 1 as we have only one class (mirror).
+    :param predict_mask:
+    :param gt_mask:
+    :return:
+    """
+
+    check_size(predict_mask, gt_mask)
+
+    if np.sum(predict_mask) == 0 or np.sum(gt_mask) == 0:
+        IoU = 0
+
+    n_ii = np.sum(np.logical_and(predict_mask, gt_mask))
+    t_i = np.sum(gt_mask)
+    n_ij = np.sum(predict_mask)
+
+    iou_ = n_ii / (t_i + n_ij - n_ii)
+
+    return iou_
+
+
+def f_score(predict_mask, gt_mask):
+
+    check_size(predict_mask, gt_mask)
+
+    N_p = np.sum(gt_mask)
+    N_n = np.sum(np.logical_not(gt_mask))
+    if N_p + N_n != 640 * 512:
+        raise Exception("Check if mask shape is correct!")
+
+    TP = np.sum(np.logical_and(predict_mask, gt_mask))
+    TN = np.sum(np.logical_and(np.logical_not(predict_mask), np.logical_not(gt_mask)))
+
+    precision = TP/N_p
+    if np.sum(predict_mask):
+        recall = TP/np.sum(predict_mask)
+    else:
+        recall = 0
+    alpha = 0.3
+
+    if precision == 0 and recall == 0:
+        f_score_ = 0
+    else:
+        f_score_ = (1.3*precision*recall)/(0.3*precision+recall)
+
+    return f_score_
+
+def mae(predict_mask, gt_mask):
+
+    check_size(predict_mask, gt_mask)
+
+    N_p = np.sum(gt_mask)
+    N_n = np.sum(np.logical_not(gt_mask))
+    if N_p + N_n != 640 * 512:
+        raise Exception("Check if mask shape is correct!")
+
+    mae_ = np.mean(abs(predict_mask.astype(np.int) - gt_mask.astype(np.int)))
+
+    return mae_
 
 
 def ber(predict_mask, gt_mask):

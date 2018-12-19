@@ -2,6 +2,7 @@ data/
 log/
 FCRN/
 
+*.xlsx
 .gitignore
 resnet50.h5
 resnet101.h5

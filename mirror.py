@@ -19,7 +19,7 @@ class MirrorConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 6
+    GPU_COUNT = 2
     IMAGES_PER_GPU = 1
 
     # Use small images for faster training. Set the limits of the small side
@@ -29,22 +29,22 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    # Pretrained_Model_Path = "/home/taylor/Mirror-Segmentation/pspnet101_voc2012.h5"
-    Pretrained_Model_Path = "/root/pspnet101_voc2012.h5"
+    Pretrained_Model_Path = "/home/iccd/Mirror-Segmentation/pspnet101_voc2012.h5"
+    # Pretrained_Model_Path = "/root/pspnet101_voc2012.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
 
     LOSS_WEIGHTS = {
         "mask_loss": 1.0,
-        "edge_loss": 0.1,
-        "depth_loss": 0.1,
+        # "edge_loss": 0.1,
+        # "depth_loss": 0.1,
     }
 
     # Use a small epoch since the data is simple
-    STEPS_PER_EPOCH = int(3465/(GPU_COUNT*IMAGES_PER_GPU))
+    STEPS_PER_EPOCH = int(3798/(GPU_COUNT*IMAGES_PER_GPU))
 
     # use small validation steps since the epoch is small
-    VALIDATION_STEPS = int(247/(GPU_COUNT*IMAGES_PER_GPU))
+    VALIDATION_STEPS = int(1000/(GPU_COUNT*IMAGES_PER_GPU))
 
     # Learning rate
     LEARNING_RATE = 0.01
@@ -74,7 +74,8 @@ class MirrorDataset(utils.Dataset):
         for i in range(count):
             filestr = imglist[i].split(".")[0]  # 10.jpg for example
             image_path = img_folder + "/" + imglist[i]
-            mask_path = mask_folder + "/" + filestr + "_json/label8.png"
+            # mask_path = mask_folder + "/" + filestr + "_json/label8.png"
+            mask_path = mask_folder + "/" + filestr + ".png"
             edge_path = mask_folder + "/" + filestr + "_json/edge.png"
             # depth_path = mask_folder + "/" + filestr + "_json/depth.png"
             depth_path = img_folder + "/../depth_original/" + filestr + ".png"
@@ -99,19 +100,31 @@ class MirrorDataset(utils.Dataset):
             image = image[..., :3]
         return image
 
+    # def load_mask(self, image_id):
+    #     global iter_num
+    #     info = self.image_info[image_id]
+    #     image = Image.open(info['mask_path'])
+    #     num_obj = self.get_obj_index(image)
+    #     mask = np.zeros([info['height'], info['width']], dtype=np.uint8)
+    #     for index in range(num_obj):
+    #         """j is row and i is column"""
+    #         for i in range(info['width']):
+    #             for j in range(info['height']):
+    #                 at_pixel = image.getpixel((i, j))
+    #                 if at_pixel == index + 1:
+    #                     mask[j, i] = 1  # [height width channel] i.e. [h, w]
+    #
+    #     return mask
+
     def load_mask(self, image_id):
         global iter_num
         info = self.image_info[image_id]
         image = Image.open(info['mask_path'])
-        num_obj = self.get_obj_index(image)
         mask = np.zeros([info['height'], info['width']], dtype=np.uint8)
-        for index in range(num_obj):
-            """j is row and i is column"""
-            for i in range(info['width']):
-                for j in range(info['height']):
-                    at_pixel = image.getpixel((i, j))
-                    if at_pixel == index + 1:
-                        mask[j, i] = 1  # [height width channel] i.e. [h, w]
+        for i in range(info['width']):
+            for j in range(info['height']):
+                if image.getpixel((i, j)):
+                    mask[j, i] = 1
 
         return mask
 
