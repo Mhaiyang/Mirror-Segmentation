@@ -460,13 +460,13 @@ def unmold_mask(predict_mask):
 
     Returns a binary mask with the same size as the original image.
     """
-    threshold = 0.5
-    mask = np.where(predict_mask >= threshold, 1, 0).astype(np.uint8)
+    # threshold = 0.5
+    # mask = np.where(predict_mask >= threshold, 1, 0).astype(np.uint8)
     # for prob
     # mask = (255*predict_mask).astype(np.uint8)
 
     # Final mask
-    final_mask = mask
+    final_mask = predict_mask
 
     return final_mask
 

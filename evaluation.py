@@ -108,7 +108,7 @@ def resize_mask(gt_mask, size):
 #
 #     return accuracy_
 
-
+# not very suitable.
 def accuracy_mirror(predict_mask, gt_mask):
     """
     sum_i(n_ii) / sum_i(t_i)

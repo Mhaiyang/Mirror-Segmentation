@@ -13,19 +13,19 @@ import mirror
 import mhy.psp as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_MSD")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_MSD9")
     
 config = mirror.MirrorConfig()
 config.display()
 
 # Configuration
-dataset_root_path = os.path.abspath(os.path.join(ROOT_DIR, "./MSD"))
+dataset_root_path = os.path.abspath(os.path.join(ROOT_DIR, "./MSD9"))
 train_folder = dataset_root_path + "/train"
 val_folder = dataset_root_path + "/test"
 train_image_folder = train_folder + "/image"
@@ -65,9 +65,9 @@ if init_with == "last":
 # 1. Train the head branches 1e-2
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=60,
+            epochs=30,
             layers='all')
-model_path = os.path.join(MODEL_DIR, "mirror_psp_MSD_all_60.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_psp_MSD9_all_30.h5")
 model.keras_model.save_weights(model_path)
 
 # 2. Fine tune all layers 1e-3

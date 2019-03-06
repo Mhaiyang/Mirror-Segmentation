@@ -13,16 +13,19 @@ import mhy.visualize as visualize
 import evaluation
 from mirror import MirrorConfig
 # Important, need change when test different models.
-import mhy.psp as modellib
+import mhy.segnet as modellib
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Directories of the project
 ROOT_DIR = os.getcwd()
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "psp_MSD")
-MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_psp_MSD_all_60.h5")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "segnet_msd9")
+MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror_segnet_all_60.h5")
 # MIRROR_MODEL_PATH = os.path.join(MODEL_DIR, "mirror20181111T1153/mirror_0045.h5")
-IMAGE_DIR = os.path.join(ROOT_DIR, "MSD", "test", "image")
-MASK_DIR = os.path.join(ROOT_DIR, "MSD", "test", "mask")
-OUTPUT_PATH = os.path.join(ROOT_DIR, "MSD_results", "MSD_PSP")
+IMAGE_DIR = "/home/iccd/data/msd9/test/image"
+MASK_DIR = "/home/iccd/data/msd9/test/mask"
+OUTPUT_PATH = os.path.join(ROOT_DIR, "msd9_results", "msd9_segnet")
 if not os.path.exists(OUTPUT_PATH):
     os.mkdir(OUTPUT_PATH)
 
@@ -39,7 +42,7 @@ config = InferenceConfig()
 config.display()
 
 # ## Create Model and Load Trained Weights
-model = modellib.PSP(mode="inference", config=config, model_dir=MODEL_DIR)
+model = modellib.SEGNET(mode="inference", config=config, model_dir=MODEL_DIR)
 # ## Load weights
 model.load_weights(MIRROR_MODEL_PATH, by_name=True)
 
@@ -112,7 +115,7 @@ print(len(F))
 print(len(MAE))
 print(len(BER))
 
-evaluation.data_write('./MSD_results/MSD_PSP.xlsx', [NUM, ACC_mirror, IOU, F, MAE, BER])
+evaluation.data_write('./MSD9_results/MSD9_PSP.xlsx', [NUM, ACC_mirror, IOU, F, MAE, BER])
 
 print("For Test Data Set, \n{:20} {:.2f} \n{:20} {:.2f} \n{:20} {:.3f} \n{:20} {:.3f} \n{:20} {:.2f}".
       format("mean_ACC_mirror", mean_ACC_mirror, "mean_IOU", mean_IOU, "mean_F", mean_F, "mean_MAE", mean_MAE, "mean_BER", mean_BER))

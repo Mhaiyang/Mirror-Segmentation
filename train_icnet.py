@@ -13,13 +13,13 @@ import mirror
 import mhy.icnet as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "icnet")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "icnet_msd9")
     
 config = mirror.MirrorConfig()
 config.LOSS_WEIGHTS = {
@@ -33,9 +33,9 @@ config.LEARNING_RATE = 0.01
 config.display()
 
 # Configuration
-dataset_root_path = os.path.abspath(os.path.join(ROOT_DIR, "./data_640"))
+dataset_root_path = "/home/iccd/data/msd9"
 train_folder = dataset_root_path + "/train"
-val_folder = dataset_root_path + "/val"
+val_folder = dataset_root_path + "/test"
 train_image_folder = train_folder + "/image"
 train_mask_folder = train_folder + "/mask"
 val_image_folder = val_folder + "/image"
@@ -61,28 +61,28 @@ dataset_val.prepare("validation")
 # ## Create Model  ###
 model = modellib.ICNET(mode="training", config=config, model_dir=MODEL_DIR)
 
-# Which weights to start with?
-init_with = "resnet101"  # resnet or last
-
-if init_with == "last":
-    # Load the last model you trained and continue training
-    model.load_weights(model.find_last()[1], by_name=True)
+# # Which weights to start with?
+# init_with = "resnet101"  # resnet or last
+#
+# if init_with == "last":
+#     # Load the last model you trained and continue training
+#     model.load_weights(model.find_last()[1], by_name=True)
 
 # ## Training
 
 # 2. Fine tune all layers 1e-2
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=120,
+            epochs=150,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_icnet_all_120.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_icnet_all_150.h5")
 model.keras_model.save_weights(model_path)
 
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=150,
+            epochs=180,
             layers="all", save_model_each_epoch=False)
-model_path = os.path.join(MODEL_DIR, "mirror_icnet_all_150.h5")
+model_path = os.path.join(MODEL_DIR, "mirror_icnet_all_180.h5")
 model.keras_model.save_weights(model_path)
 
 

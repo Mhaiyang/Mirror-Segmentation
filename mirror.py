@@ -19,8 +19,8 @@ class MirrorConfig(Config):
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 2
-    IMAGES_PER_GPU = 1
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 2
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
@@ -29,7 +29,7 @@ class MirrorConfig(Config):
     IMAGE_MAX_DIM = 640
 
     BACKBONE = "resnet101"
-    Pretrained_Model_Path = "/home/iccd/Mirror-Segmentation/pspnet101_voc2012.h5"
+    # Pretrained_Model_Path = "/home/iccd/Mirror-Segmentation/pspnet101_voc2012.h5"
     # Pretrained_Model_Path = "/root/pspnet101_voc2012.h5"
 
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]   # for compute pyramid feature size
@@ -41,13 +41,13 @@ class MirrorConfig(Config):
     }
 
     # Use a small epoch since the data is simple
-    STEPS_PER_EPOCH = int(3798/(GPU_COUNT*IMAGES_PER_GPU))
+    STEPS_PER_EPOCH = int(3063/(GPU_COUNT*IMAGES_PER_GPU))
 
     # use small validation steps since the epoch is small
-    VALIDATION_STEPS = int(1000/(GPU_COUNT*IMAGES_PER_GPU))
+    VALIDATION_STEPS = int(955/(GPU_COUNT*IMAGES_PER_GPU))
 
     # Learning rate
-    LEARNING_RATE = 0.01
+    LEARNING_RATE = 0.001
 
 
 # Dataset

@@ -13,21 +13,21 @@ import mirror
 import mhy.segnet as modellib
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "log", "segnet")
+MODEL_DIR = os.path.join(ROOT_DIR, "log", "segnet_msd9")
     
 config = mirror.MirrorConfig()
 config.display()
 
 # Configuration
-dataset_root_path = os.path.abspath(os.path.join(ROOT_DIR, "./data_640"))
+dataset_root_path = "/home/iccd/data/msd9"
 train_folder = dataset_root_path + "/train"
-val_folder = dataset_root_path + "/val"
+val_folder = dataset_root_path + "/test"
 train_image_folder = train_folder + "/image"
 train_mask_folder = train_folder + "/mask"
 val_image_folder = val_folder + "/image"
